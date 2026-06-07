@@ -11,9 +11,10 @@ Abra `index.html` no navegador. Sem dependências, sem build, tudo offline.
 Para publicar online de graça: **Settings → Pages → Branch: `main` / root**.
 O portal fica em `https://SEU_USUARIO.github.io/agua-cafe/`.
 
-## Duas páginas
+## Três páginas
 
 - `index.html` — construir água do zero (base destilada/osmose).
+- `kit.html` — lista de minerais, equipamentos e acessórios com links de compra.
 - `avaliador.html` — avaliar uma água mineral de rótulo e corrigir até o alvo.
   Se a água já passa do alvo em dureza/alcalinidade (ou tem sódio/cloreto/TDS
   altos), o app **não recomenda** adicionar e explica o porquê — mineral só se
