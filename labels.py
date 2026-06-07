@@ -1,12 +1,60 @@
-from PIL import Image, ImageDraw, ImageFont
+#!/usr/bin/env python3
+"""Gera os 4 PNGs de etiqueta (um por mineral) em ./labels/.
 
-FD = "/home/claude/fonts/"
+Portátil: caminhos relativos ao próprio arquivo e download automático das
+fontes (Zilla Slab + DejaVu Sans Mono) na primeira execução.
+
+Uso:
+    pip install pillow
+    python labels.py
+"""
+import sys
+import urllib.request
+from pathlib import Path
+
+try:
+    from PIL import Image, ImageDraw, ImageFont
+except ImportError:
+    sys.exit("Pillow não encontrado. Rode: pip install pillow")
+
+# --- caminhos relativos ao script (funciona de qualquer diretório) ---
+BASE = Path(__file__).resolve().parent
+FONT_DIR = BASE / "fonts"
+OUT_DIR = BASE / "labels"
+
+# --- fontes: baixadas na primeira execução se faltarem ---
+# Zilla Slab (google/fonts) + DejaVu Sans Mono (mirror em TTF).
+FONTS = {
+    "ZillaSlab-Regular.ttf":  "https://github.com/google/fonts/raw/main/ofl/zillaslab/ZillaSlab-Regular.ttf",
+    "ZillaSlab-Medium.ttf":   "https://github.com/google/fonts/raw/main/ofl/zillaslab/ZillaSlab-Medium.ttf",
+    "ZillaSlab-SemiBold.ttf": "https://github.com/google/fonts/raw/main/ofl/zillaslab/ZillaSlab-SemiBold.ttf",
+    "ZillaSlab-Bold.ttf":     "https://github.com/google/fonts/raw/main/ofl/zillaslab/ZillaSlab-Bold.ttf",
+    "ZillaSlab-Light.ttf":    "https://github.com/google/fonts/raw/main/ofl/zillaslab/ZillaSlab-Light.ttf",
+    "DejaVuSansMono.ttf":     "https://github.com/senotrusov/dejavu-fonts-ttf/raw/master/ttf/DejaVuSansMono.ttf",
+}
+
+
+def ensure_fonts():
+    FONT_DIR.mkdir(parents=True, exist_ok=True)
+    for fname, url in FONTS.items():
+        dest = FONT_DIR / fname
+        if dest.exists():
+            continue
+        print(f"baixando {fname} …")
+        req = urllib.request.Request(url, headers={"User-Agent": "agua-cafe/labels.py"})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                data = r.read()
+        except Exception as e:
+            sys.exit(f"falha ao baixar {fname} de {url}\n  {e}")
+        dest.write_bytes(data)
+
+
 def zf(w, s):
     m = {"sb":"ZillaSlab-SemiBold.ttf","md":"ZillaSlab-Medium.ttf","rg":"ZillaSlab-Regular.ttf",
          "bd":"ZillaSlab-Bold.ttf","lt":"ZillaSlab-Light.ttf"}
-    return ImageFont.truetype(FD+m[w], s)
-MONO = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
-def mf(s): return ImageFont.truetype(MONO, s)
+    return ImageFont.truetype(str(FONT_DIR / m[w]), s)
+def mf(s): return ImageFont.truetype(str(FONT_DIR / "DejaVuSansMono.ttf"), s)
 
 def hx(h): h=h.lstrip("#"); return tuple(int(h[i:i+2],16) for i in (0,2,4))
 def mix(a,b,t): return tuple(round(a[i]+(b[i]-a[i])*t) for i in range(3))
@@ -16,16 +64,16 @@ PAPER=hx("F4EEE2"); INK=hx("2B211A"); MUT=hx("6E6053"); LIGHT=hx("F7F2E8")
 W,H = 720,1080
 
 DATA = [
-  dict(key="mg", name="Magnésio", cat="Dureza", color=hx("1E6F8E"),
+  dict(key="mg", file="magnesio", name="Magnésio", cat="Dureza", color=hx("1E6F8E"),
        grams="12,32", func="Doçura + acidez",
        formula=[("MgSO",0),("4",1),("·7H",0),("2",1),("O",0)]),
-  dict(key="ca", name="Cálcio", cat="Dureza", color=hx("3F7D43"),
+  dict(key="ca", file="calcio", name="Cálcio", cat="Dureza", color=hx("3F7D43"),
        grams="7,35", func="Corpo · estrutura",
        formula=[("CaCl",0),("2",1),("·2H",0),("2",1),("O",0)]),
-  dict(key="na", name="Sódio", cat="Alcalinidade", color=hx("C07A2B"),
+  dict(key="na", file="sodio", name="Sódio", cat="Alcalinidade", color=hx("C07A2B"),
        grams="4,20", func="Corpo · buffer redondo",
        formula=[("NaHCO",0),("3",1)]),
-  dict(key="k", name="Potássio", cat="Alcalinidade", color=hx("B0463A"),
+  dict(key="k", file="potassio", name="Potássio", cat="Alcalinidade", color=hx("B0463A"),
        grams="5,01", func="Buffer limpo",
        formula=[("KHCO",0),("3",1)]),
 ]
@@ -89,8 +137,11 @@ def make(d):
     # trim border
     dr.rectangle([12,12,W-13,H-13],outline=mix(INK,PAPER,0.55),width=2)
 
-    p=f"/home/claude/etiqueta_{d['key']}.png"
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    p=OUT_DIR / f"{d['file']}.png"
     img.save(p,dpi=(300,300)); return p
 
-for d in DATA:
-    print(make(d))
+if __name__ == "__main__":
+    ensure_fonts()
+    for d in DATA:
+        print(make(d))
