@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Avaliador de água mineral · café</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --paper:#F2ECE0; --surf:#FAF6EE; --surf2:#EBE3D3;
+  --ink:#2B211A; --ink2:#6E6053; --ink3:#9C8E7E;
+  --line:rgba(43,33,26,.13); --line2:rgba(43,33,26,.28);
+  --mg:#1E6F8E; --ca:#3F7D43; --na:#C07A2B; --k:#B0463A;
+  --coffee:#7A4B22; --good:#3F7D43; --bad:#B0463A;
+  --r:12px; --rs:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper); color:var(--ink); font-family:'Hanken Grotesk',sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(43,33,26,.035) 1px,transparent 1px); background-size:22px 22px}
+.wrap{max-width:860px; margin:0 auto; padding:22px 18px 64px}
+.num{font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums}
+.nav{display:flex; gap:8px; margin-bottom:22px}
+.nav a{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; text-decoration:none; color:var(--ink2); border:1px solid var(--line2); padding:7px 13px; border-radius:99px}
+.nav a.on{background:var(--ink); color:var(--surf); border-color:var(--ink)}
+header{margin-bottom:24px}
+.kicker{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--coffee); margin-bottom:8px}
+h1{font-family:'Fraunces',serif; font-weight:500; font-size:32px; line-height:1.05; letter-spacing:-.01em}
+h1 em{font-style:italic; color:var(--coffee)}
+.sub{color:var(--ink2); font-size:14.5px; margin-top:8px; max-width:62ch}
+.card{background:var(--surf); border:1px solid var(--line); border-radius:var(--r); padding:18px 18px 20px; margin-bottom:16px}
+.label{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink3); margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; gap:10px}
+.btnlink{font-family:'Hanken Grotesk'; text-transform:none; letter-spacing:0; font-size:12.5px; color:var(--coffee); background:none; border:1px solid var(--line2); border-radius:99px; padding:5px 12px; cursor:pointer}
+.btnlink:hover{background:var(--surf2)}
+.wgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+@media(max-width:560px){.wgrid{grid-template-columns:repeat(2,1fr)}}
+.field label{display:block; font-size:12px; color:var(--ink2); margin-bottom:4px}
+.field .iw{display:flex; align-items:baseline; gap:4px; border:1px solid var(--line2); border-radius:6px; padding:6px 9px; background:var(--surf)}
+.field .iw:focus-within{border-color:var(--ink)}
+.field input{width:100%; border:none; background:none; font-family:'JetBrains Mono',monospace; font-size:15px; color:var(--ink); outline:none}
+.field .u{font-size:11px; color:var(--ink3); font-family:'JetBrains Mono',monospace; white-space:nowrap}
+.presets{display:flex; flex-wrap:wrap; gap:7px}
+.preset{font-size:13px; padding:7px 13px; border:1px solid var(--line2); background:transparent; color:var(--ink); border-radius:99px; cursor:pointer}
+.preset:hover{background:var(--surf2)} .preset.on{background:var(--ink); color:var(--surf); border-color:var(--ink)}
+.seg{display:inline-flex; border:1px solid var(--line2); border-radius:99px; overflow:hidden; margin-top:4px}
+.seg button{font-family:'Hanken Grotesk'; font-size:13px; padding:6px 14px; border:none; background:transparent; color:var(--ink); cursor:pointer}
+.seg button.on{background:var(--coffee); color:#fff}
+.vols{display:flex; flex-wrap:wrap; gap:7px}
+.vol{font-family:'JetBrains Mono',monospace; font-size:13px; padding:7px 12px; border:1px solid var(--line2); background:transparent; border-radius:var(--rs); cursor:pointer; color:var(--ink)}
+.vol.on{background:var(--coffee); color:#fff; border-color:var(--coffee)}
+.stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:6px}
+.stat{background:var(--surf2); border-radius:var(--rs); padding:12px 14px}
+.stat .k{font-size:10.5px; font-family:'JetBrains Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2)}
+.stat .v{font-family:'Fraunces',serif; font-size:25px; font-weight:500; line-height:1.1; margin-top:2px}
+.stat .u{font-size:10.5px; color:var(--ink3); font-family:'JetBrains Mono',monospace}
+.tag{display:inline-block; font-size:13px; font-weight:500; padding:5px 13px; border-radius:99px; margin-bottom:10px}
+.tag.good{background:#E1F0DF; color:#2C5A2F} .tag.mid{background:#F6E9D6; color:#6B4A18} .tag.bad{background:#F3DAD5; color:#7E2A1E}
+.flags{list-style:none; font-size:14px}
+.flags li{padding:6px 0 6px 20px; position:relative; border-top:1px dashed var(--line)}
+.flags li:before{content:'·'; position:absolute; left:6px; font-weight:700}
+.flags li.warn:before{content:'!'; color:var(--bad)} .flags li.ok:before{content:'✓'; color:var(--good)}
+.blend{background:#EAF1F4; border:1px solid #B9D4DE; border-radius:var(--rs); padding:13px 15px; font-size:14px; margin-bottom:12px}
+.blend b{font-weight:600}
+.impossible{background:#F3DAD5; border:1px solid #DDA89D; border-radius:var(--rs); padding:13px 15px; font-size:14px; margin-bottom:12px; color:#6E2417}
+.dose{display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px dashed var(--line)}
+.dose:first-child{border-top:none}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.dose .nm{font-weight:500; width:130px; flex:none}
+.dose .big{font-family:'Fraunces',serif; font-size:24px; font-weight:500}
+.dose .big small{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink2)}
+.dose .mt{font-size:12px; color:var(--ink2); font-family:'JetBrains Mono',monospace; margin-left:auto; text-align:right}
+.note{font-size:12.5px; color:var(--ink2); margin-top:12px; line-height:1.55}
+.foot{font-size:12px; color:var(--ink3); margin-top:22px; text-align:center; line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="nav">
+  <a href="index.html">Construir do zero</a>
+  <a href="avaliador.html" class="on">Corrigir água mineral</a>
+</nav>
+<header>
+  <div class="kicker">Rótulo de supermercado → café</div>
+  <h1>Avaliador <em>& corretor</em> de água</h1>
+  <p class="sub">Informe os minerais do rótulo. O portal avalia a água e, se ela servir de base, calcula as gotas até o seu alvo. Se não servir, diz por quê — mineral só se <strong>adiciona</strong>, nunca se remove.</p>
+</header>
+
+<div class="card">
+  <div class="label"><span>A água que você tem (mg/L do rótulo)</span><button class="btnlink" id="exbtn">preencher exemplo</button></div>
+  <div class="wgrid" id="wgrid"></div>
+  <p class="note">📷 Leitura por foto do rótulo: ainda não nesta versão (a página é estática, sem servidor). Por ora, digite os valores — ou fotografe e me peça para extrair.</p>
+</div>
+
+<div class="card">
+  <div class="label">Avaliação para café</div>
+  <div class="stats" id="evstats"></div>
+  <div id="verdict"></div>
+  <ul class="flags" id="flags"></ul>
+</div>
+
+<div class="card">
+  <div class="label">Seu alvo</div>
+  <div class="presets" id="presets"></div>
+  <div style="margin-top:14px; font-size:13px; color:var(--ink2)">Completar a alcalinidade que faltar com:
+    <div class="seg" id="alksrc"><button data-s="k" class="on">Potássio</button><button data-s="na">Sódio</button></div>
+  </div>
+  <div style="margin-top:14px; font-size:13px; color:var(--ink2); margin-bottom:8px">Volume da extração:</div>
+  <div class="vols" id="vols"></div>
+</div>
+
+<div class="card">
+  <div class="label">Correção</div>
+  <div id="correction"></div>
+</div>
+
+<div class="card">
+  <div class="label">Resultado depois de corrigir</div>
+  <div class="stats" id="resstats"></div>
+  <p class="note" id="resnote"></p>
+</div>
+
+<p class="foot">Soluções-mãe a 0,5 mol/L, gota 0,062 mL (mesmas das etiquetas).<br>Diluição assume água destilada/osmose com ~0 mineral.</p>
+</div>
+
+<script>
+const ION={mg:24.305, ca:40.078, na:22.990, k:39.098, hco3:61.017, so4:96.06, cl:35.453};
+const SALT={mg:246.47, ca:147.01, na:84.007, k:100.115};
+const STOCKM=0.5, DROPV=0.062;
+const FIELDS=[
+  ['ca','Cálcio','mg/L'],['mg','Magnésio','mg/L'],['na','Sódio','mg/L'],
+  ['k','Potássio','mg/L'],['hco3','Bicarbonato','mg/L'],['so4','Sulfato','mg/L'],
+  ['cl','Cloreto','mg/L'],['tds','TDS / resíduo','mg/L'],['ph','pH','']
+];
+const PRESETS=[
+  {n:'Doçura & acidez',v:{mg:12,ca:4,na:0,k:22.4}},
+  {n:'Equilibrado',v:{mg:7,ca:17,na:0,k:30}},
+  {n:'Brilhante / leve',v:{mg:10,ca:2,na:0,k:12}},
+  {n:'Encorpado',v:{mg:8,ca:25,na:0,k:35}},
+  {n:'☕ Espresso (sem cálcio)',v:{mg:15,ca:0,na:10,k:16}},
+];
+const VOLS=[300,400,450,500,600,800,1000,2000,5000];
+const EXAMPLE={ca:4,mg:2,na:3,k:1,hco3:18,so4:2,cl:3,tds:40,ph:6.8};
+
+let water={ca:0,mg:0,na:0,k:0,hco3:0,so4:0,cl:0,tds:0,ph:0};
+let target=0, alkSrc='k', vol=500;
+
+const $=s=>document.querySelector(s);
+const fmt=(x,d=0)=>x.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const ghF=(ca,mg)=>mg*4.118+ca*2.497;
+const khF=h=>h*0.8201;
+const volTxt=v=>v>=1000?(v/1000)+' L':v+' ml';
+
+function buildFields(){
+  $('#wgrid').innerHTML=FIELDS.map(([k,nm,u])=>
+    `<div class="field"><label>${nm}</label><div class="iw"><input class="num" data-k="${k}" type="number" step="any" value="${water[k]||''}" placeholder="0">${u?`<span class="u">${u}</span>`:''}</div></div>`).join('');
+  $('#wgrid').querySelectorAll('input').forEach(i=>i.oninput=()=>{water[i.dataset.k]=parseFloat(i.value)||0; render();});
+}
+function buildPresets(){
+  $('#presets').innerHTML=PRESETS.map((p,i)=>`<button class="preset ${i===target?'on':''}" data-i="${i}">${p.n}</button>`).join('');
+  $('#presets').querySelectorAll('.preset').forEach(b=>b.onclick=()=>{target=+b.dataset.i; buildPresets(); render();});
+}
+function buildVols(){
+  $('#vols').innerHTML=VOLS.map(v=>`<button class="vol ${v===vol?'on':''}" data-v="${v}">${volTxt(v)}</button>`).join('');
+  $('#vols').querySelectorAll('.vol').forEach(b=>b.onclick=()=>{vol=+b.dataset.v; buildVols(); render();});
+}
+$('#alksrc')&&$('#alksrc').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  alkSrc=b.dataset.s; $('#alksrc').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); render();
+});
+$('#exbtn').onclick=()=>{water={...EXAMPLE}; buildFields(); render();};
+
+function evaluate(){
+  const gh=ghF(water.ca,water.mg), kh=khF(water.hco3);
+  $('#evstats').innerHTML=
+    `<div class="stat"><div class="k">Dureza GH</div><div class="v num">${fmt(gh)}</div><div class="u">ppm CaCO₃</div></div>
+     <div class="stat"><div class="k">Alcalinidade KH</div><div class="v num">${fmt(kh)}</div><div class="u">ppm CaCO₃</div></div>
+     <div class="stat"><div class="k">TDS rótulo</div><div class="v num">${water.tds?fmt(water.tds):'—'}</div><div class="u">mg/L</div></div>`;
+  const f=[]; const empty=gh<8&&kh<8&&water.na<5;
+  let cls='mid', verdict='Utilizável com ajuste';
+  if(empty){cls='good'; verdict='Base excelente — quase zerada, construa à vontade'; f.push(['ok','Pouquíssimo mineral: funciona como destilada para montar qualquer perfil.']);}
+  else{
+    if(gh>150||kh>80||(water.tds>400)){cls='bad'; verdict='Difícil para café';}
+    else if(gh>=40&&gh<=120&&kh>=15&&kh<=50&&water.na<25){cls='good'; verdict='Boa — utilizável com pequenos ajustes';}
+    if(gh<40)f.push(['ok','Dureza baixa: dá pra subir Mg/Ca livremente.']);
+    else if(gh>120)f.push(['warn','Dureza alta ('+fmt(gh)+'): corpo pesado e risco de incrustação no espresso. Só diluindo pra baixar.']);
+    else f.push(['','Dureza média ('+fmt(gh)+').']);
+    if(kh>50)f.push(['warn','Alcalinidade alta ('+fmt(kh)+'): abafa a acidez. Não dá pra reduzir adicionando — só diluir.']);
+    else if(kh<15)f.push(['ok','Alcalinidade baixa: acidez fica expressiva, e dá pra completar o buffer.']);
+    if(water.na>25)f.push(['warn','Sódio alto ('+fmt(water.na)+' mg/L): tende a achatar a xícara.']);
+    if(water.cl>25)f.push(['warn','Cloreto alto ('+fmt(water.cl)+' mg/L): risco de corrosão e sabor metálico.']);
+    if(water.so4>50)f.push(['','Sulfato elevado ('+fmt(water.so4)+' mg/L): tende a secar e realçar amargor.']);
+    if(water.tds>400)f.push(['warn','TDS alto ('+fmt(water.tds)+'): mineralizada demais.']);
+  }
+  $('#verdict').innerHTML=`<span class="tag ${cls}">${verdict}</span>`;
+  $('#flags').innerHTML=f.map(([c,t])=>`<li class="${c}">${t}</li>`).join('');
+}
+
+function dropsFor(ionMM, deficit){
+  const need=deficit/ionMM*(vol/1000);
+  return Math.round(need/(STOCKM*DROPV));
+}
+function render(){
+  evaluate();
+  const p=PRESETS[target].v;
+  const tMg=p.mg, tCa=p.ca, tHco3=(p.k/ION.k + p.na/ION.na)*ION.hco3;
+  const gh=ghF(water.ca,water.mg), kh=khF(water.hco3);
+
+  // razões para NÃO recomendar adicionar (sem diluição)
+  const reasons=[];
+  if(tMg>0.01 && water.mg>tMg+0.5) reasons.push(`Magnésio já está em ${fmt(water.mg)} ppm, acima do alvo (${fmt(tMg)}). Adicionar só sobe — não dá pra reduzir.`);
+  if(tCa>0.01 && water.ca>tCa+0.5) reasons.push(`Cálcio já está em ${fmt(water.ca)} ppm, acima do alvo (${fmt(tCa)}). Não dá pra reduzir adicionando.`);
+  if(water.hco3>tHco3+1) reasons.push(`Alcalinidade já está em ${fmt(water.hco3)} mg/L de bicarbonato, acima do alvo (${fmt(tHco3)}). Buffer alto abafa a acidez e não some com adição.`);
+  if(tCa<=0.01 && water.ca>0.5) reasons.push(`Este perfil pede cálcio zero, mas a água tem ${fmt(water.ca)} ppm — só dá com água destilada.`);
+  if(water.na>25) reasons.push(`Sódio alto (${fmt(water.na)} mg/L): achata a xícara, e mineralizar não corrige.`);
+  if(water.cl>30) reasons.push(`Cloreto alto (${fmt(water.cl)} mg/L): risco de corrosão e sabor; adicionar piora.`);
+  if(water.tds>400) reasons.push(`TDS alto (${fmt(water.tds)} mg/L): água já muito mineralizada para construir em cima.`);
+
+  if(reasons.length){
+    $('#correction').innerHTML=`<div class="impossible"><b>Não recomendado adicionar minerais a esta água.</b><ul style="margin:8px 0 0 18px; padding:0">`
+      + reasons.map(r=>`<li style="margin:4px 0">${r}</li>`).join('')
+      + `</ul><div style="margin-top:10px">Para este alvo, parta de água destilada/osmose na aba <b>Construir do zero</b>.</div></div>`;
+    $('#resstats').innerHTML=
+      `<div class="stat"><div class="k">Dureza GH</div><div class="v num">${fmt(gh)}</div><div class="u">ppm CaCO₃</div></div>
+       <div class="stat"><div class="k">Alcalinidade KH</div><div class="v num">${fmt(kh)}</div><div class="u">ppm CaCO₃</div></div>
+       <div class="stat"><div class="k">TDS rótulo</div><div class="v num">${water.tds?fmt(water.tds):'—'}</div><div class="u">mg/L</div></div>`;
+    $('#resnote').textContent='Perfil atual da água. Correção não recomendada — motivos acima.';
+    return;
+  }
+
+  // água serve de base: completa só o que falta (sem diluir)
+  const addMg=Math.max(0,tMg-water.mg);
+  const addCa=Math.max(0,tCa-water.ca);
+  const addHco3=Math.max(0,tHco3-water.hco3);
+  const adds=[];
+  if(addMg>0.05)adds.push(['Magnésio','var(--mg)',dropsFor(ION.mg,addMg),'MgSO₄']);
+  if(addCa>0.05)adds.push(['Cálcio','var(--ca)',dropsFor(ION.ca,addCa),'CaCl₂']);
+  if(addHco3>0.05){
+    const c=alkSrc==='k'?['Potássio','var(--k)','KHCO₃']:['Sódio','var(--na)','NaHCO₃'];
+    adds.push([c[0],c[1],dropsFor(ION.hco3,addHco3),c[2]]);
+  }
+  let html;
+  if(adds.length){
+    html=`<p class="note" style="margin-top:0; margin-bottom:6px"><b>Esta água serve de base.</b> Para ${volTxt(vol)}, adicione:</p>`+adds.map(([nm,col,dr,salt])=>{
+      const usePip=dr>40, ml=dr*DROPV;
+      const main=usePip?`${fmt(ml,1)}<small> mL pipeta</small>`:`${dr}<small> gota${dr===1?'':'s'}</small>`;
+      return `<div class="dose"><span class="dot" style="background:${col}"></span><span class="nm">${nm}<br><span style="font-size:11px;color:var(--ink3);font-weight:400">${salt}</span></span><span class="big num">${main}</span><span class="mt">${usePip?'≈ '+dr+' gt':'= '+fmt(ml,2)+' mL'}</span></div>`;
+    }).join('');
+  } else {
+    html=`<p class="note"><b>Esta água já está no alvo</b> nos íons relevantes — nada a adicionar.</p>`;
+  }
+  $('#correction').innerHTML=html;
+
+  const mgF=water.mg+addMg, caF=water.ca+addCa, hco3F=water.hco3+addHco3;
+  const naF=water.na+(alkSrc==='na'?addHco3/ION.hco3*ION.na:0);
+  const kF=water.k+(alkSrc==='k'?addHco3/ION.hco3*ION.k:0);
+  const so4F=water.so4+addMg/ION.mg*ION.so4;
+  const clF=water.cl+addCa/ION.ca*(2*ION.cl);
+  const ghr=ghF(caF,mgF), khr=khF(hco3F);
+  const tdsF=mgF+caF+naF+kF+so4F+clF+hco3F;
+  $('#resstats').innerHTML=
+    `<div class="stat"><div class="k">Dureza GH</div><div class="v num">${fmt(ghr)}</div><div class="u">ppm CaCO₃</div></div>
+     <div class="stat"><div class="k">Alcalinidade KH</div><div class="v num">${fmt(khr)}</div><div class="u">ppm CaCO₃</div></div>
+     <div class="stat"><div class="k">TDS aprox.</div><div class="v num">${fmt(tdsF)}</div><div class="u">mg/L</div></div>`;
+  let rn=`Cálcio ${fmt(caF)} · Magnésio ${fmt(mgF)} · Sódio ${fmt(naF)} · Cloreto ${fmt(clF)} mg/L.`;
+  if(clF>30)rn+=' ⚠ Cloreto acima de 30 mg/L — atenção à corrosão no espresso.';
+  $('#resnote').textContent=rn;
+}
+
+buildFields(); buildPresets(); buildVols(); render();
+</script>
+</body>
+</html>
