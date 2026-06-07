@@ -33,16 +33,21 @@ h1 em{font-style:italic; color:var(--coffee)}
 .item .body{flex:1; min-width:200px}
 .item .ttl{font-weight:500; font-size:15.5px; line-height:1.3}
 .item .role{font-size:13px; color:var(--ink2); margin-top:3px}
-.item .right{display:flex; flex-direction:column; align-items:flex-end; gap:7px; margin-left:auto}
-.price{font-family:'JetBrains Mono',monospace; font-size:14px; white-space:nowrap}
-.price .was{color:var(--ink3); text-decoration:line-through; font-size:12px; margin-left:4px}
-.price.soft{color:var(--ink3); font-size:12.5px}
+.item .right{display:flex; flex-direction:column; align-items:flex-end; gap:6px; margin-left:auto; text-align:right}
+.price{font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:500; white-space:nowrap}
+.price .was{color:var(--ink3); text-decoration:line-through; font-size:12px; font-weight:400; margin-left:4px}
+.estlbl{font-size:10.5px; font-family:'JetBrains Mono',monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--ink3)}
+.subnote{font-size:11px; color:var(--ink3); max-width:150px; line-height:1.4}
 .sbtn{font-family:'Hanken Grotesk'; font-size:13px; font-weight:500; text-decoration:none; padding:7px 14px; border-radius:99px; white-space:nowrap; border:1px solid}
 .sbtn.shopee{color:#fff; background:#EE4D2D; border-color:#EE4D2D}
 .sbtn.iherb{color:#fff; background:#4A8A3D; border-color:#4A8A3D}
 .sbtn.search{color:var(--coffee); background:transparent; border-color:var(--line2)}
-.have{font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--ca); border:1px solid var(--ca); border-radius:99px; padding:2px 9px}
-.foot{font-size:12px; color:var(--ink3); margin-top:26px; text-align:center; line-height:1.6}
+.totalbox{background:var(--surf2); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px; margin-top:22px}
+.totalbox .tt{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3); margin-bottom:8px}
+.totalbox .line{display:flex; justify-content:space-between; font-size:14px; padding:4px 0}
+.totalbox .line .v{font-family:'JetBrains Mono',monospace; font-weight:500}
+.totalbox .big{font-family:'Fraunces',serif; font-size:22px; font-weight:500}
+.foot{font-size:12px; color:var(--ink3); margin-top:24px; text-align:center; line-height:1.6}
 </style>
 </head>
 <body>
@@ -55,10 +60,10 @@ h1 em{font-style:italic; color:var(--coffee)}
 <header>
   <div class="kicker">Minerais & equipamentos</div>
   <h1>Monte seu <em>kit</em></h1>
-  <p class="sub">Tudo que você precisa para mineralizar água do zero. Os itens marcados foram o que você comprou; os demais são recomendações para fechar o kit.</p>
+  <p class="sub">Tudo para mineralizar água do zero: os quatro minerais, o que pesar e medir, e os opcionais. Cada item com preço de referência e link.</p>
 </header>
 
-<div class="disc">Preços conferidos em <b>jun/2026</b>. Só o iHerb pôde ser lido automaticamente — os da Shopee mudam direto, confira sempre no link antes de comprar.</div>
+<div class="disc">Preços de referência conferidos em <b>jun/2026</b> (Shopee e iHerb). Itens marcados <b>estimado</b> são faixa de mercado. Preço de marketplace muda direto — confira sempre no link.</div>
 
 <div class="grouptitle">Minerais</div>
 
@@ -66,9 +71,9 @@ h1 em{font-style:italic; color:var(--coffee)}
   <span class="dot" style="background:var(--mg)"></span>
   <div class="body">
     <div class="ttl">Kit Sais Cervejeiros 100 g</div>
-    <div class="role">Cloreto de cálcio + sulfato de cálcio + sulfato de magnésio. Cobre o <b>magnésio</b> (MgSO₄) e o <b>cálcio</b> (CaCl₂); o sulfato de cálcio fica de reserva (só serve para coado, não vira solução-mãe).</div>
+    <div class="role">Cloreto de cálcio + sulfato de cálcio + sulfato de magnésio. Cobre o <b>magnésio</b> (MgSO₄) e o <b>cálcio</b> (CaCl₂); o sulfato de cálcio fica de reserva (só para coado, não vira solução-mãe).</div>
   </div>
-  <div class="right"><span class="price soft">ver na loja</span><a class="sbtn shopee" href="https://shopee.com.br/Kit-Sais-Cervejeiros-100-GRAMAS-(Cloreto-de-C%C3%A1lcio-Sulfato-de-C%C3%A1lcio-Sulfato-de-Magn%C3%A9sio)-i.338637781.22198734810" target="_blank" rel="noopener">Shopee</a></div>
+  <div class="right"><span class="price">R$ 40,82</span><a class="sbtn shopee" href="https://shopee.com.br/Kit-Sais-Cervejeiros-100-GRAMAS-(Cloreto-de-C%C3%A1lcio-Sulfato-de-C%C3%A1lcio-Sulfato-de-Magn%C3%A9sio)-i.338637781.22198734810" target="_blank" rel="noopener">Shopee</a></div>
 </div>
 
 <div class="item">
@@ -77,7 +82,7 @@ h1 em{font-style:italic; color:var(--coffee)}
     <div class="ttl">Bicarbonato de Sódio 100 g</div>
     <div class="role">Fonte de <b>sódio</b> (NaHCO₃) — alcalinidade e corpo redondo, sem cloreto.</div>
   </div>
-  <div class="right"><span class="price soft">ver na loja</span><a class="sbtn shopee" href="https://shopee.com.br/BICARBONATO-de-S%C3%B3dio-100g-i.338637781.20198642851" target="_blank" rel="noopener">Shopee</a></div>
+  <div class="right"><span class="price">R$ 13,67</span><a class="sbtn shopee" href="https://shopee.com.br/BICARBONATO-de-S%C3%B3dio-100g-i.338637781.20198642851" target="_blank" rel="noopener">Shopee</a></div>
 </div>
 
 <div class="item">
@@ -86,7 +91,7 @@ h1 em{font-style:italic; color:var(--coffee)}
     <div class="ttl">Nutricost Bicarbonato de Potássio 454 g</div>
     <div class="role">Fonte de <b>potássio</b> (KHCO₃) — alcalinidade limpa, a recomendada. Pote grande, dura muito.</div>
   </div>
-  <div class="right"><span class="price">R$ 94,00 <span class="was">R$ 110,59</span></span><a class="sbtn iherb" href="https://br.iherb.com/pr/nutricost-potassium-bicarbonate-unflavored-16-oz-454-g/132299" target="_blank" rel="noopener">iHerb</a></div>
+  <div class="right"><span class="price">R$ 83,50</span><span class="subnote">compra internacional: com frete + impostos, ≈ R$ 150 entregue</span><a class="sbtn iherb" href="https://br.iherb.com/pr/nutricost-potassium-bicarbonate-unflavored-16-oz-454-g/132299" target="_blank" rel="noopener">iHerb</a></div>
 </div>
 
 <div class="grouptitle">Equipamentos</div>
@@ -97,7 +102,7 @@ h1 em{font-style:italic; color:var(--coffee)}
     <div class="ttl">Mini balança digital 0,01 g / 500 g</div>
     <div class="role">Pesar os sais. A precisão de 0,01 g é o mínimo para as massas pequenas (o cálcio fica abaixo de 1 g).</div>
   </div>
-  <div class="right"><span class="price soft">ver na loja</span><a class="sbtn shopee" href="https://shopee.com.br/Mini-Balan%C3%A7a-Digital-Alta-Precis%C3%A3o-0-01g-500g-Para-Joias-Ouro-Farm%C3%A1cia-e-outros-i.1275331716.21498264161" target="_blank" rel="noopener">Shopee</a></div>
+  <div class="right"><span class="price">R$ 29,99</span><a class="sbtn shopee" href="https://shopee.com.br/Mini-Balan%C3%A7a-Digital-Alta-Precis%C3%A3o-0-01g-500g-Para-Joias-Ouro-Farm%C3%A1cia-e-outros-i.1275331716.21498264161" target="_blank" rel="noopener">Shopee</a></div>
 </div>
 
 <div class="item">
@@ -106,7 +111,16 @@ h1 em{font-style:italic; color:var(--coffee)}
     <div class="ttl">Becker de vidro graduado 250 mL</div>
     <div class="role">Misturar a solução e completar até a marca. Use a graduação para fechar o volume — mais certo que somar água.</div>
   </div>
-  <div class="right"><span class="price soft">ver na loja</span><a class="sbtn shopee" href="https://shopee.com.br/BECKER-DE-VIDRO-GRADUADO-250ML-FORMA-BAIXA-i.1251088147.23397493991" target="_blank" rel="noopener">Shopee</a></div>
+  <div class="right"><span class="price">R$ 16,72</span><a class="sbtn shopee" href="https://shopee.com.br/BECKER-DE-VIDRO-GRADUADO-250ML-FORMA-BAIXA-i.1251088147.23397493991" target="_blank" rel="noopener">Shopee</a></div>
+</div>
+
+<div class="item">
+  <span class="dot" style="background:var(--coffee)"></span>
+  <div class="body">
+    <div class="ttl">Frascos de vidro conta-gotas 100 mL (5 un)</div>
+    <div class="role">Um por mineral (Mg, Ca, Na, K) e ainda sobra um. Vidro transparente; se quiser proteção da luz, prefira âmbar.</div>
+  </div>
+  <div class="right"><span class="price">R$ 28,13</span><a class="sbtn shopee" href="https://shopee.com.br/Frasco-De-Vidro-Conta-Gotas-100ml-(5-Unidades)-i.1025844680.22393119953" target="_blank" rel="noopener">Shopee</a></div>
 </div>
 
 <div class="item">
@@ -115,50 +129,46 @@ h1 em{font-style:italic; color:var(--coffee)}
     <div class="ttl">Kit acessórios (funil, abridor de roll-on, pipeta 3 mL)</div>
     <div class="role">Pipeta para dosar em mL nos volumes grandes (galão); funil para encher os frascos sem desperdício.</div>
   </div>
-  <div class="right"><span class="price soft">ver na loja</span><a class="sbtn shopee" href="https://shopee.com.br/kit-de-Acess%C3%B3rios-aromaterapia-funil-abridor-de-rollon-e-Pipeta-3-ml-i.603210326.18573990878" target="_blank" rel="noopener">Shopee</a></div>
+  <div class="right"><span class="price">R$ 27,00</span><a class="sbtn shopee" href="https://shopee.com.br/kit-de-Acess%C3%B3rios-aromaterapia-funil-abridor-de-rollon-e-Pipeta-3-ml-i.603210326.18573990878" target="_blank" rel="noopener">Shopee</a></div>
 </div>
 
-<div class="item">
-  <span class="dot" style="background:var(--coffee)"></span>
-  <div class="body">
-    <div class="ttl">Kit 5 frascos âmbar 100 mL com conta-gotas </div>
-    <div class="role">Um por mineral (Mg, Ca, Na, K). Âmbar protege da luz.</div>
-  </div>
-  <div class="right"><span class="price soft">ver na loja</span><a class="sbtn shopee" href="https://shopee.com.br/Frasco-De-Vidro-Conta-Gotas-100ml-(5-Unidades)-i.1025844680.22393119953" target="_blank" rel="noopener">Shopee</a></div>
-</div>
-
-
-
-<div class="grouptitle">Recomendações para fechar o kit</div>
+<div class="grouptitle">Opcionais</div>
 
 <div class="item">
   <span class="dot" style="background:var(--ink3)"></span>
   <div class="body">
     <div class="ttl">Água destilada / desmineralizada</div>
-    <div class="role">A base de tudo. Galão de destilada (auto-elétricas/farmácias) ou osmose reversa. Deve marcar TDS ~0.</div>
+    <div class="role">A base de tudo. Mais barata em lojas locais (auto-elétricas, farmácias) que em marketplace. Deve marcar TDS ~0.</div>
   </div>
-  <div class="right"><span class="price soft">ver na loja</span><a class="sbtn search" href="https://shopee.com.br/search?keyword=agua%20destilada%205%20litros" target="_blank" rel="noopener">buscar</a></div>
+  <div class="right"><span class="price">R$ 16,00</span><span class="estlbl">loja local</span><a class="sbtn search" href="https://shopee.com.br/search?keyword=agua%20destilada%205%20litros" target="_blank" rel="noopener">buscar</a></div>
 </div>
 
 <div class="item">
   <span class="dot" style="background:var(--ink3)"></span>
   <div class="body">
-    <div class="ttl">Caneta medidora de TDS (opcional)</div>
-    <div class="role">Conferir o TDS da base (deve dar ~0) e da água pronta como sanidade. Mede o total, não separa íons — não substitui o cálculo.</div>
+    <div class="ttl">Caneta medidora de TDS</div>
+    <div class="role">Confere o TDS da base (deve dar ~0) e da água pronta, como sanidade. Mede o total, não separa íons — não substitui o cálculo.</div>
   </div>
-  <div class="right"><span class="price soft">ver na loja</span><a class="sbtn search" href="https://shopee.com.br/search?keyword=medidor%20tds%20caneta" target="_blank" rel="noopener">buscar</a></div>
+  <div class="right"><span class="price">≈ R$ 25–40</span><span class="estlbl">estimado</span><a class="sbtn search" href="https://shopee.com.br/search?keyword=medidor%20tds%20caneta" target="_blank" rel="noopener">buscar</a></div>
 </div>
 
 <div class="item">
   <span class="dot" style="background:var(--ink3)"></span>
   <div class="body">
-    <div class="ttl">Proveta graduada 100 mL (opcional)</div>
-    <div class="role">Para "completar até 100 mL" com mais precisão que o becker, ao preparar as soluções-mãe.</div>
+    <div class="ttl">Proveta graduada 100 mL</div>
+    <div class="role">Para "completar até 100 mL" com mais precisão que o becker ao preparar as soluções-mãe.</div>
   </div>
-  <div class="right"><span class="price soft">ver na loja</span><a class="sbtn search" href="https://shopee.com.br/search?keyword=proveta%20graduada%20100ml" target="_blank" rel="noopener">buscar</a></div>
+  <div class="right"><span class="price">≈ R$ 30–45</span><span class="estlbl">estimado</span><a class="sbtn search" href="https://shopee.com.br/search?keyword=proveta%20graduada%20100ml%20vidro" target="_blank" rel="noopener">buscar</a></div>
 </div>
 
-<p class="foot">Os botões "buscar" abrem uma busca na Shopee, não um produto específico — escolha o que tiver melhor preço/avaliação.<br>Links de produto são os que você enviou; nenhum é patrocinado.</p>
+<div class="totalbox">
+  <div class="tt">Estimativa do kit</div>
+  <div class="line"><span>Essencial (minerais + equipamentos + água)</span><span class="v">≈ R$ 256</span></div>
+  <div class="line"><span>Com frete + impostos de importação do potássio</span><span class="v">≈ R$ 322</span></div>
+  <div class="line"><span>Opcionais (TDS + proveta)</span><span class="v">≈ R$ 55–85</span></div>
+</div>
+
+<p class="foot">Os botões "buscar" abrem uma busca na Shopee, não um produto específico — escolha o de melhor preço/avaliação.<br>Nenhum link é patrocinado. Preços são referência e variam.</p>
 </div>
 </body>
 </html>
