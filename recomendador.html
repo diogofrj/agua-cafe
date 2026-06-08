@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Café → água ideal · recomendador</title>
+<meta name="description" content="Escolha um café (ou monte por processo e torra) e receba o perfil de água sob medida — quantas gotas de cada mineral e o método de preparo.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 3C10 12 7 16 7 21a9 9 0 0 0 18 0c0-5-3-9-9-18z' fill='%237A4B22'/></svg>">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root{
+  --paper:#F2ECE0; --surf:#FAF6EE; --surf2:#EBE3D3;
+  --ink:#2B211A; --ink2:#6E6053; --ink3:#9C8E7E;
+  --line:rgba(43,33,26,.13); --line2:rgba(43,33,26,.28);
+  --mg:#1E6F8E; --ca:#3F7D43; --na:#C07A2B; --k:#B0463A;
+  --coffee:#7A4B22;
+  --r:12px; --rs:8px;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:'Hanken Grotesk',sans-serif; font-size:16px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(43,33,26,.035) 1px,transparent 1px);
+  background-size:22px 22px;
+}
+.wrap{max-width:860px; margin:0 auto; padding:28px 18px 64px}
+.num{font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums}
+
+nav{display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap}
+nav a{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; text-decoration:none; color:var(--ink2); border:1px solid var(--line2); padding:7px 13px; border-radius:99px}
+nav a.on{color:var(--surf); background:var(--ink); border-color:var(--ink)}
+
+header{margin-bottom:26px}
+.kicker{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--coffee); margin-bottom:8px}
+h1{font-family:'Fraunces',serif; font-weight:500; font-size:33px; line-height:1.05; letter-spacing:-.01em}
+h1 em{font-style:italic; color:var(--coffee)}
+.sub{color:var(--ink2); font-size:14.5px; margin-top:8px; max-width:62ch}
+
+.card{background:var(--surf); border:1px solid var(--line); border-radius:var(--r); padding:18px 18px 20px; margin-bottom:16px}
+.label{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink3); margin-bottom:12px}
+.note{font-size:12.5px; color:var(--ink2); margin-top:10px; line-height:1.55}
+
+select{width:100%; font-family:'Hanken Grotesk',sans-serif; font-size:15px; padding:11px 12px; background:var(--surf); border:1px solid var(--line2); border-radius:var(--rs); color:var(--ink); cursor:pointer}
+select:focus{outline:none; border-color:var(--ink)}
+.selrow{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+@media(max-width:560px){.selrow{grid-template-columns:1fr}}
+.selrow label{display:block; font-size:12px; color:var(--ink2); margin-bottom:5px}
+
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.tag{font-size:12px; padding:4px 10px; border-radius:99px; background:var(--surf2); color:var(--ink2)}
+.meta{font-size:13px; color:var(--ink2); margin-top:8px}
+.meta b{color:var(--ink); font-weight:500}
+
+.row{display:flex; align-items:center; gap:14px; padding:11px 0; border-top:1px dashed var(--line)}
+.row:first-of-type{border-top:none}
+.dot{width:10px; height:10px; border-radius:50%; flex:none}
+.mname{font-weight:500; font-size:15px; flex:none; width:128px}
+input[type=range]{-webkit-appearance:none; appearance:none; flex:1; min-width:0; height:4px; border-radius:2px; background:var(--surf2); outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--ink); cursor:pointer; border:3px solid var(--surf)}
+input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; background:var(--ink); cursor:pointer; border:3px solid var(--surf)}
+.eixoval{flex:none; width:42px; text-align:right; font-family:'JetBrains Mono',monospace; font-size:15px}
+
+.vols{display:flex; flex-wrap:wrap; gap:7px; align-items:center}
+.vol{font-family:'JetBrains Mono',monospace; font-size:13px; padding:7px 12px; border:1px solid var(--line2); background:transparent; border-radius:var(--rs); cursor:pointer; color:var(--ink)}
+.vol:hover{background:var(--surf2)}
+.vol.on{background:var(--coffee); color:#fff; border-color:var(--coffee)}
+
+.badge{display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:500; padding:9px 14px; border-radius:99px; border:1px solid var(--line2)}
+.badge.espresso{background:#F0E6D2; border-color:#D9B97E; color:#6B4A18}
+.badge.coado{background:#E4ECE0; border-color:#A7C49C; color:#3a5a32}
+.badge.versatil{background:var(--surf2); color:var(--ink2)}
+
+.stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+.stat{background:var(--surf2); border-radius:var(--rs); padding:13px 14px; min-width:0}
+.stat .k{font-size:11px; font-family:'JetBrains Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2)}
+.stat .v{font-family:'Fraunces',serif; font-size:26px; font-weight:500; line-height:1.1; margin-top:3px}
+.stat .u{font-size:11px; color:var(--ink3); font-family:'JetBrains Mono',monospace}
+
+.dosegrid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+@media(max-width:560px){.dosegrid{grid-template-columns:1fr 1fr} .stats{grid-template-columns:1fr 1fr}}
+.dose{border:1px solid var(--line); border-left-width:4px; border-radius:var(--rs); padding:12px 14px; background:var(--surf)}
+.dose h4{font-family:'Hanken Grotesk'; font-weight:500; font-size:14px; display:flex; align-items:center; gap:7px; margin-bottom:6px}
+.dose .big{font-family:'Fraunces',serif; font-size:30px; font-weight:500; line-height:1}
+.dose .big small{font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:400; color:var(--ink2)}
+.dose .meta{font-size:12px; color:var(--ink2); font-family:'JetBrains Mono',monospace; margin-top:5px}
+
+.warn{background:#F6E9D6; border:1px solid #E0C597; border-radius:var(--rs); padding:11px 14px; font-size:13px; color:#6B4A18; margin-top:14px; display:none}
+.warn.show{display:block}
+.warn b{font-weight:600}
+
+.actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px}
+.abtn{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.04em; color:var(--ink2); background:transparent; border:1px solid var(--line2); border-radius:99px; padding:8px 14px; cursor:pointer; text-decoration:none; display:inline-block}
+.abtn:hover{background:var(--surf2)}
+.foot{font-size:12px; color:var(--ink3); margin-top:22px; line-height:1.6; text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a href="index.html">Construir do zero</a>
+  <a href="recomendador.html" class="on">Café → água</a>
+  <a href="kit.html">Monte seu kit</a>
+  <a href="avaliador.html">Corrigir água mineral</a>
+  <a href="etiquetas.html">Etiquetas</a>
+</nav>
+
+<header>
+  <div class="kicker">Café especial → água sob medida</div>
+  <h1>Qual água para <em>este café?</em></h1>
+  <p class="sub">Escolha um café cadastrado — ou monte pelo processo e torra impressos no pacote — e receba o perfil de água calculado: quantas gotas de cada mineral, e o melhor método de preparo. Quem decide a água é o <b>processo</b>, não a variedade.</p>
+</header>
+
+<div class="card">
+  <div class="label">1 · Escolha o café</div>
+  <select id="cafesel" aria-label="Café"></select>
+
+  <div id="cafeinfo" style="display:none">
+    <div class="meta" id="cafemeta"></div>
+    <div class="tags" id="cafetags"></div>
+  </div>
+
+  <div id="manualinfo" style="display:none">
+    <div class="selrow" style="margin-top:14px">
+      <div>
+        <label for="procsel">Processo</label>
+        <select id="procsel" aria-label="Processo"></select>
+      </div>
+      <div>
+        <label for="torrasel">Torra</label>
+        <select id="torrasel" aria-label="Torra"></select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="label">2 · Ajuste fino <span style="text-transform:none; letter-spacing:0; color:var(--ink3)">— se o pacote te surpreender</span></div>
+  <div id="eixos"></div>
+  <p class="note">Estes três eixos vêm do processo + torra e movem a receita. Mexa só se a xícara fugir do esperado.</p>
+</div>
+
+<div class="card">
+  <div class="label">3 · Volume da extração</div>
+  <div class="vols" id="vols"></div>
+</div>
+
+<div class="card">
+  <div class="label">Aptidão & método</div>
+  <div id="aptidao"></div>
+</div>
+
+<div class="card">
+  <div class="label">Água recomendada — perfil resultante</div>
+  <div class="stats" id="stats"></div>
+  <p class="note" id="profilenote"></p>
+  <div class="warn" id="tdswarn"></div>
+</div>
+
+<div class="card">
+  <div class="label">Quanto pingar — <span id="dosevol" class="num"></span> · água destilada/osmose</div>
+  <div class="dosegrid" id="doses"></div>
+  <p class="note">Gotas arredondadas para inteiro (1 gota ≈ 0,062 mL da solução-mãe a 0,5 mol/L). O ppm mostrado é o real após o arredondamento.</p>
+  <div class="actions">
+    <a class="abtn" id="opendetail" href="#">🔧 Abrir no “Construir do zero” (receita dos frascos)</a>
+  </div>
+</div>
+
+<p class="foot">Minerais: MgSO₄·7H₂O · CaCl₂·2H₂O · KHCO₃ — base água destilada/osmose.<br>Perfil calculado para coado/filtrado. Para extrair em espresso, prefira o perfil <b>Espresso</b> (sem cálcio) no “Construir do zero”.</p>
+</div>
+
+<script src="data.js"></script>
+<script src="cafes.js"></script>
+<script>
+// data.js → M, KEYS, VOLS, STOCKM, DROPV
+// cafes.js → CAFES, PROCESSOS, TORRAS, baselineEixos, alvoPpm, aptidao
+
+const $=s=>document.querySelector(s);
+const fmt=(x,d=0)=>x.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+
+let state={ cafeId:CAFES[0].id, manual:false, eixos:{...pickEixos(CAFES[0])}, vol:500 };
+
+function pickEixos(c){ return {acidez:c.acidez, corpo:c.corpo, aroma:c.aroma, processo:c.processo}; }
+
+// --- química (mesma de data.js / index.html, recriada aqui p/ a página abrir sozinha) ---
+function hco3(p){ return p.na/M.na.mmIon*61.017 + p.k/M.k.mmIon*61.017; }
+function gh(p){ return p.mg*4.118 + p.ca*2.497; }
+function kh(p){ return hco3(p)*0.8201; }
+function tds(p){
+  const so4=p.mg/M.mg.mmIon*96.06;
+  const cl=p.ca/M.ca.mmIon*70.906;
+  return p.mg+p.ca+p.na+p.k+so4+cl+hco3(p);
+}
+function dropsFor(key,ppm,vol){
+  const need=ppm/M[key].mmIon*(vol/1000);
+  return Math.round(need/(STOCKM*DROPV));
+}
+function actualPpm(key,drops,vol){ return drops*STOCKM*DROPV/(vol/1000)*M[key].mmIon; }
+
+// --- selects ---
+function buildCafeSelect(){
+  const opts = CAFES.map(c=>`<option value="${c.id}">${c.nome} · ${c.torrefador}</option>`).join('');
+  $('#cafesel').innerHTML = opts + `<option value="__manual">— montar pelo processo + torra —</option>`;
+  $('#cafesel').value = state.manual ? '__manual' : state.cafeId;
+  $('#cafesel').onchange = e=>{
+    if(e.target.value==='__manual'){
+      state.manual=true;
+      state.eixos={...baselineEixos($('#procsel').value, $('#torrasel').value), processo:$('#procsel').value};
+    } else {
+      state.manual=false; state.cafeId=e.target.value;
+      state.eixos=pickEixos(CAFES.find(c=>c.id===e.target.value));
+    }
+    renderAll();
+  };
+}
+function buildProcTorra(){
+  $('#procsel').innerHTML = Object.entries(PROCESSOS).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');
+  $('#torrasel').innerHTML = Object.entries(TORRAS).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');
+  $('#procsel').value = state.eixos.processo || 'honey';
+  $('#torrasel').value = 'media';
+  const recompute=()=>{
+    state.eixos={...baselineEixos($('#procsel').value, $('#torrasel').value), processo:$('#procsel').value};
+    renderEixos(); renderOutputs();
+  };
+  $('#procsel').onchange=recompute;
+  $('#torrasel').onchange=recompute;
+}
+function renderCafeInfo(){
+  const manual=state.manual;
+  $('#cafeinfo').style.display = manual?'none':'block';
+  $('#manualinfo').style.display = manual?'block':'none';
+  if(!manual){
+    const c=CAFES.find(x=>x.id===state.cafeId);
+    const pts = c.pontuacao?` · ${c.pontuacao} SCA`:'';
+    $('#cafemeta').innerHTML = `<b>${PROCESSOS[c.processo].n}</b> · torra ${TORRAS[c.torra].n.toLowerCase()} · ${c.variedade} · ${c.origem}${pts}`;
+    $('#cafetags').innerHTML = c.notas.map(n=>`<span class="tag">${n}</span>`).join('');
+  }
+}
+
+// --- eixos ---
+const EIXO_META=[
+  {k:'acidez', n:'Acidez',           color:'var(--mg)'},
+  {k:'corpo',  n:'Corpo',            color:'var(--ca)'},
+  {k:'aroma',  n:'Aroma/fermentação',color:'var(--k)'},
+];
+function renderEixos(){
+  $('#eixos').innerHTML = EIXO_META.map(e=>`
+    <div class="row">
+      <span class="dot" style="background:${e.color}"></span>
+      <span class="mname">${e.n}</span>
+      <input type="range" min="0" max="10" step="0.5" value="${state.eixos[e.k]}" data-e="${e.k}" class="sl">
+      <span class="eixoval num">${fmt(state.eixos[e.k],1)}</span>
+    </div>`).join('');
+  $('#eixos').querySelectorAll('.sl').forEach(s=>s.oninput=()=>{
+    state.eixos[s.dataset.e]=+s.value;
+    s.parentElement.querySelector('.eixoval').textContent=fmt(+s.value,1);
+    renderOutputs();
+  });
+}
+
+// --- volume ---
+function buildVols(){
+  $('#vols').innerHTML = VOLS.map(v=>
+    `<button class="vol ${state.vol===v?'on':''}" data-v="${v}">${v>=1000?(v/1000)+' L':v+' ml'}</button>`).join('');
+  $('#vols').querySelectorAll('.vol').forEach(b=>b.onclick=()=>{ state.vol=+b.dataset.v; buildVols(); renderOutputs(); });
+}
+
+// --- saída ---
+function renderOutputs(){
+  const p=alvoPpm(state.eixos);
+
+  // aptidão
+  const ap=aptidao(state.eixos);
+  $('#aptidao').innerHTML =
+    `<span class="badge ${ap.nivel}">${ap.rotulo}</span>
+     <p class="note" style="margin-top:10px">${ap.metodo}</p>`;
+
+  // perfil
+  const g=gh(p),k=kh(p),t=tds(p);
+  $('#stats').innerHTML=
+    `<div class="stat"><div class="k">Mg · Ca · K</div><div class="v num">${p.mg}·${p.ca}·${p.k}</div><div class="u">ppm dos íons</div></div>
+     <div class="stat"><div class="k">Dureza GH</div><div class="v num">${fmt(g)}</div><div class="u">ppm CaCO₃</div></div>
+     <div class="stat"><div class="k">Alcalinidade KH</div><div class="v num">${fmt(k)}</div><div class="u">ppm CaCO₃</div></div>`;
+  let note='';
+  if(g<35)note='Dureza baixa: corpo leve. ';
+  else if(g>90)note='Dureza alta: corpo pesado. ';
+  else note='Dureza média. ';
+  if(k<20)note+='Buffer baixo: acidez bem expressiva.';
+  else if(k>45)note+='Buffer alto: segura a acidez.';
+  else note+='Buffer médio.';
+  $('#profilenote').textContent=note;
+
+  // guarda-corpo de TDS
+  const w=$('#tdswarn');
+  if(t>180){ w.classList.add('show'); w.innerHTML=`<b>TDS ${fmt(t)} mg/L</b> — perfil bem carregado para esse volume; pode abafar. A faixa SCA confortável é ~75–150.`; }
+  else if(t<60){ w.classList.add('show'); w.innerHTML=`<b>TDS ${fmt(t)} mg/L</b> — água bem leve; pode sair aguada. A faixa SCA confortável é ~75–150.`; }
+  else { w.classList.remove('show'); }
+
+  // doses
+  $('#dosevol').textContent = state.vol>=1000?(state.vol/1000)+' L':state.vol+' ml';
+  $('#doses').innerHTML = KEYS.filter(key=>p[key]>0).map(key=>{
+    const m=M[key], drops=dropsFor(key,p[key],state.vol);
+    const ml=drops*DROPV, actual=actualPpm(key,drops,state.vol);
+    const usePip=drops>40;
+    const main=usePip?`${fmt(ml,1)}<small> mL</small>`:`${drops}<small> gota${drops===1?'':'s'}</small>`;
+    return `<div class="dose" style="border-left-color:${m.color}">
+      <h4><span class="dot" style="background:${m.color}"></span>${m.name}</h4>
+      <div class="big num">${main}</div>
+      <div class="meta">íon real ${fmt(actual,1)} ppm</div>
+    </div>`;
+  }).join('');
+
+  // link p/ index.html com o alvo no hash
+  $('#opendetail').href = `index.html#mg=${p.mg}&ca=${p.ca}&na=${p.na}&k=${p.k}&v=${state.vol}`;
+}
+
+function renderAll(){ buildCafeSelect(); renderCafeInfo(); renderEixos(); renderOutputs(); }
+
+buildProcTorra();
+buildVols();
+renderAll();
+</script>
+</body>
+</html>

@@ -13,9 +13,13 @@ cai numa fonte do sistema e o portal continua funcionando).
 Para publicar online de graça: **Settings → Pages → Branch: `main` / root**.
 O portal fica em `https://SEU_USUARIO.github.io/agua-cafe/`.
 
-## Quatro páginas
+## Cinco páginas
 
 - `index.html` — construir água do zero (base destilada/osmose).
+- `recomendador.html` — **café → água ideal**: escolha um café cadastrado (ou
+  monte pelo processo + torra do pacote) e receba o perfil de água sob medida —
+  quantas gotas de cada mineral, GH/KH/TDS e a aptidão de preparo (espresso/coado).
+  Quem decide a água é o **processo**, não a variedade.
 - `kit.html` — lista de minerais, equipamentos e acessórios com links de compra.
 - `avaliador.html` — avaliar uma água mineral de rótulo e corrigir até o alvo.
   Se a água já passa do alvo em dureza/alcalinidade (ou tem sódio/cloreto/TDS
@@ -25,7 +29,9 @@ O portal fica em `https://SEU_USUARIO.github.io/agua-cafe/`.
   (com linhas de corte) para recortar e colar em cada conta-gotas.
 
 As constantes químicas e os perfis ficam em `data.js` (fonte única), carregado
-por `index.html` e `avaliador.html`.
+por `index.html` e `avaliador.html`. O banco de cafés e o motor `café → água`
+ficam em `cafes.js`, carregado por `recomendador.html` (cadastrar um café = adicionar
+um objeto a `CAFES`).
 
 ## O que ele faz
 

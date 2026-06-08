@@ -25,10 +25,12 @@ Padrão para uma nova sessão/modelo retomar sem atrito:
 
 ## Arquivos
 - `index.html` — construir do zero (presets + ppm livre → receita das soluções + gotas).
+- `recomendador.html` — escolher um café (ou montar por processo+torra) → alvo de água sob medida, gotas e aptidão (espresso/coado). Linka de volta ao `index.html` via `#hash`.
 - `kit.html` — lista de compras (minerais, equipamentos, preços, links). Conteúdo estático.
 - `avaliador.html` — avaliar rótulo de água mineral e corrigir até o alvo (sem diluir).
 - `etiquetas.html` — escolher tamanho/cópias e imprimir as etiquetas (com linhas de corte) para colar nos frascos.
 - `data.js` — fonte única de massas molares, calibração e perfis; carregado por `index.html` e `avaliador.html` **antes** do script inline.
+- `cafes.js` — banco de cafés (seed) + motor `café → água`; carregado por `recomendador.html` **depois** do `data.js` (usa `M`, `KEYS`).
 - `labels.py` — gera os 4 PNGs de etiqueta (Pillow; baixa as fontes sozinho na 1ª execução).
 - `labels/` — PNGs gerados. `fonts/` — TTFs baixadas (no `.gitignore`).
 
@@ -49,6 +51,13 @@ Fórmulas:
 
 Quatro minerais → quatro frascos separados: Magnésio (MgSO₄·7H₂O), Cálcio (CaCl₂·2H₂O), Sódio (NaHCO₃), Potássio (KHCO₃).
 Preparo do frasco: dissolver e **completar até a marca**. NUNCA "100 − massa" (o sal ocupa volume).
+
+## Modelo café → água (`cafes.js` / `recomendador.html`)
+Quem decide a água é o **processo + torra**, NÃO a variedade (o mesmo Mundo Novo dá xícaras opostas). Esses dois definem três eixos 0–10 (acidez, corpo, aroma/fermentação); o motor traduz em ppm para **coado**:
+- `Mg = 5 + 4·a + 4·ar` (acidez e aroma) · `Ca = 2 + 23·c` (corpo) · `K = max(6, 14 + 22·c − 8·a − 6·ar)` (buffer sobe com corpo, desce com acidez/aroma). `a,c,ar` = eixos/10.
+- Coeficientes calibrados para os extremos baterem com os `PRESETS` do `data.js`. Mexeu nos presets? Reconfira os extremos aqui.
+- Sódio fica 0 (é a alavanca do espresso, não do coado). Espresso é só um **selo de aptidão** (`aptidao()`), não um segundo caminho químico — para a água de espresso, manda pro perfil Espresso do `index.html`.
+- Eixos por café são editáveis na UI (override): o processo dá o ponto de partida, o usuário corrige se o pacote surpreender.
 
 ## Regras de química (regressão aqui = bug)
 - Magnésio e Cálcio nunca no mesmo frasco — sulfato + cálcio precipita CaSO₄.
