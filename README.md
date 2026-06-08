@@ -6,12 +6,14 @@ qualquer volume — só muda o número de gotas.
 
 ## Abrir
 
-Abra `index.html` no navegador. Sem dependências, sem build, tudo offline.
+Abra `index.html` no navegador. Sem dependências e sem build. As fontes vêm do
+Google Fonts (precisa de internet para a tipografia exata; sem rede, o navegador
+cai numa fonte do sistema e o portal continua funcionando).
 
 Para publicar online de graça: **Settings → Pages → Branch: `main` / root**.
 O portal fica em `https://SEU_USUARIO.github.io/agua-cafe/`.
 
-## Três páginas
+## Quatro páginas
 
 - `index.html` — construir água do zero (base destilada/osmose).
 - `kit.html` — lista de minerais, equipamentos e acessórios com links de compra.
@@ -19,6 +21,11 @@ O portal fica em `https://SEU_USUARIO.github.io/agua-cafe/`.
   Se a água já passa do alvo em dureza/alcalinidade (ou tem sódio/cloreto/TDS
   altos), o app **não recomenda** adicionar e explica o porquê — mineral só se
   adiciona, nunca se remove.
+- `etiquetas.html` — escolher, dimensionar e imprimir as etiquetas dos frascos
+  (com linhas de corte) para recortar e colar em cada conta-gotas.
+
+As constantes químicas e os perfis ficam em `data.js` (fonte única), carregado
+por `index.html` e `avaliador.html`.
 
 ## O que ele faz
 
@@ -54,8 +61,13 @@ Método: dissolver em ~70 mL de água destilada e **completar até a marca de 10
 
 ## Etiquetas
 
-`labels/` traz os 4 PNGs prontos para impressão (300 DPI, ~6×9 cm).
-Para regerar: `python3 labels.py` (precisa de Pillow e das fontes Zilla Slab).
+`labels/` traz os 4 PNGs prontos para impressão (300 DPI, ~6×9 cm). Para imprimir
+e colar nos frascos, use a página `etiquetas.html` (escolhe quais, tamanho, cópias
+e linhas de corte).
+
+Para regerar os PNGs: `pip install pillow` e `python labels.py`. Na primeira
+execução o script baixa as fontes (Zilla Slab + DejaVu Sans Mono) para `fonts/`;
+as massas dos sais são calculadas a partir das mesmas constantes do portal.
 
 ## Crédito
 

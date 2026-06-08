@@ -63,18 +63,26 @@ PAPER=hx("F4EEE2"); INK=hx("2B211A"); MUT=hx("6E6053"); LIGHT=hx("F7F2E8")
 
 W,H = 720,1080
 
+# Calibração das soluções-mãe (deve casar com data.js / index.html)
+STOCKM = 0.5      # mol/L
+STOCKV = 0.100    # L (frasco de 100 mL)
+
+def g(mm):
+    """Massa do sal por frasco = STOCKM × volume × MM_sal, formatada pt-BR."""
+    return f"{STOCKM*STOCKV*mm:.2f}".replace(".", ",")
+
 DATA = [
   dict(key="mg", file="magnesio", name="Magnésio", cat="Dureza", color=hx("1E6F8E"),
-       grams="12,32", func="Doçura + acidez",
+       grams=g(246.47), func="Doçura + acidez",
        formula=[("MgSO",0),("4",1),("·7H",0),("2",1),("O",0)]),
   dict(key="ca", file="calcio", name="Cálcio", cat="Dureza", color=hx("3F7D43"),
-       grams="7,35", func="Corpo · estrutura",
+       grams=g(147.01), func="Corpo · estrutura",
        formula=[("CaCl",0),("2",1),("·2H",0),("2",1),("O",0)]),
   dict(key="na", file="sodio", name="Sódio", cat="Alcalinidade", color=hx("C07A2B"),
-       grams="4,20", func="Corpo · buffer redondo",
+       grams=g(84.007), func="Corpo · buffer redondo",
        formula=[("NaHCO",0),("3",1)]),
   dict(key="k", file="potassio", name="Potássio", cat="Alcalinidade", color=hx("B0463A"),
-       grams="5,01", func="Buffer limpo",
+       grams=g(100.115), func="Buffer limpo",
        formula=[("KHCO",0),("3",1)]),
 ]
 

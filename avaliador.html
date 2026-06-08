@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Avaliador de água mineral · café</title>
+<meta name="description" content="Avalie uma água mineral de rótulo e veja se serve de base para café — e quantas gotas até o seu alvo. Mineral só se adiciona, nunca se remove.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 3C10 12 7 16 7 21a9 9 0 0 0 18 0c0-5-3-9-9-18z' fill='%237A4B22'/></svg>">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Avaliador & corretor de água para café">
+<meta property="og:description" content="Informe os minerais do rótulo: o portal diz se a água serve de base e calcula a correção até o alvo, sem diluir.">
+<meta property="og:url" content="https://diogofrj.github.io/agua-cafe/avaliador.html">
+<meta property="og:image" content="https://diogofrj.github.io/agua-cafe/labels/calcio.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 :root{
@@ -19,7 +27,7 @@ body{background:var(--paper); color:var(--ink); font-family:'Hanken Grotesk',san
   background-image:radial-gradient(rgba(43,33,26,.035) 1px,transparent 1px); background-size:22px 22px}
 .wrap{max-width:860px; margin:0 auto; padding:22px 18px 64px}
 .num{font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums}
-.nav{display:flex; gap:8px; margin-bottom:22px}
+.nav{display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap}
 .nav a{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; text-decoration:none; color:var(--ink2); border:1px solid var(--line2); padding:7px 13px; border-radius:99px}
 .nav a.on{background:var(--ink); color:var(--surf); border-color:var(--ink)}
 header{margin-bottom:24px}
@@ -28,11 +36,11 @@ h1{font-family:'Fraunces',serif; font-weight:500; font-size:32px; line-height:1.
 h1 em{font-style:italic; color:var(--coffee)}
 .sub{color:var(--ink2); font-size:14.5px; margin-top:8px; max-width:62ch}
 .card{background:var(--surf); border:1px solid var(--line); border-radius:var(--r); padding:18px 18px 20px; margin-bottom:16px}
-.label{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink3); margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; gap:10px}
+.label{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink3); margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap}
 .btnlink{font-family:'Hanken Grotesk'; text-transform:none; letter-spacing:0; font-size:12.5px; color:var(--coffee); background:none; border:1px solid var(--line2); border-radius:99px; padding:5px 12px; cursor:pointer}
 .btnlink:hover{background:var(--surf2)}
 .wgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
-@media(max-width:560px){.wgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.wgrid{grid-template-columns:repeat(2,1fr)} .stats{grid-template-columns:1fr 1fr}}
 .field label{display:block; font-size:12px; color:var(--ink2); margin-bottom:4px}
 .field .iw{display:flex; align-items:baseline; gap:4px; border:1px solid var(--line2); border-radius:6px; padding:6px 9px; background:var(--surf)}
 .field .iw:focus-within{border-color:var(--ink)}
@@ -48,7 +56,7 @@ h1 em{font-style:italic; color:var(--coffee)}
 .vol{font-family:'JetBrains Mono',monospace; font-size:13px; padding:7px 12px; border:1px solid var(--line2); background:transparent; border-radius:var(--rs); cursor:pointer; color:var(--ink)}
 .vol.on{background:var(--coffee); color:#fff; border-color:var(--coffee)}
 .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:6px}
-.stat{background:var(--surf2); border-radius:var(--rs); padding:12px 14px}
+.stat{background:var(--surf2); border-radius:var(--rs); padding:12px 14px; min-width:0}
 .stat .k{font-size:10.5px; font-family:'JetBrains Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2)}
 .stat .v{font-family:'Fraunces',serif; font-size:25px; font-weight:500; line-height:1.1; margin-top:2px}
 .stat .u{font-size:10.5px; color:var(--ink3); font-family:'JetBrains Mono',monospace}
@@ -123,23 +131,15 @@ h1 em{font-style:italic; color:var(--coffee)}
 <p class="foot">Soluções-mãe a 0,5 mol/L, gota 0,062 mL (mesmas das etiquetas).<br>Diluição assume água destilada/osmose com ~0 mineral.</p>
 </div>
 
+<script src="data.js"></script>
 <script>
-const ION={mg:24.305, ca:40.078, na:22.990, k:39.098, hco3:61.017, so4:96.06, cl:35.453};
-const SALT={mg:246.47, ca:147.01, na:84.007, k:100.115};
-const STOCKM=0.5, DROPV=0.062;
+// ION, STOCKM, DROPV, VOLS, PRESETS vêm de data.js (fonte única).
+const AVAL_PRESETS = PRESETS.filter(p=>!p.cmp);   // perfis-alvo (sem o de comparação)
 const FIELDS=[
   ['ca','Cálcio','mg/L'],['mg','Magnésio','mg/L'],['na','Sódio','mg/L'],
   ['k','Potássio','mg/L'],['hco3','Bicarbonato','mg/L'],['so4','Sulfato','mg/L'],
   ['cl','Cloreto','mg/L'],['tds','TDS / resíduo','mg/L'],['ph','pH','']
 ];
-const PRESETS=[
-  {n:'Doçura & acidez',v:{mg:12,ca:4,na:0,k:22.4}},
-  {n:'Equilibrado',v:{mg:7,ca:17,na:0,k:30}},
-  {n:'Brilhante / leve',v:{mg:10,ca:2,na:0,k:12}},
-  {n:'Encorpado',v:{mg:8,ca:25,na:0,k:35}},
-  {n:'☕ Espresso (sem cálcio)',v:{mg:15,ca:0,na:10,k:16}},
-];
-const VOLS=[300,400,450,500,600,800,1000,2000,5000];
 const EXAMPLE={ca:4,mg:2,na:3,k:1,hco3:18,so4:2,cl:3,tds:40,ph:6.8};
 
 let water={ca:0,mg:0,na:0,k:0,hco3:0,so4:0,cl:0,tds:0,ph:0};
@@ -153,11 +153,11 @@ const volTxt=v=>v>=1000?(v/1000)+' L':v+' ml';
 
 function buildFields(){
   $('#wgrid').innerHTML=FIELDS.map(([k,nm,u])=>
-    `<div class="field"><label>${nm}</label><div class="iw"><input class="num" data-k="${k}" type="number" step="any" value="${water[k]||''}" placeholder="0">${u?`<span class="u">${u}</span>`:''}</div></div>`).join('');
-  $('#wgrid').querySelectorAll('input').forEach(i=>i.oninput=()=>{water[i.dataset.k]=parseFloat(i.value)||0; render();});
+    `<div class="field"><label for="w-${k}">${nm}</label><div class="iw"><input id="w-${k}" class="num" data-k="${k}" type="number" step="any" min="0" inputmode="decimal" value="${water[k]||''}" placeholder="0">${u?`<span class="u">${u}</span>`:''}</div></div>`).join('');
+  $('#wgrid').querySelectorAll('input').forEach(i=>i.oninput=()=>{water[i.dataset.k]=Math.max(0,parseFloat(i.value)||0); render();});
 }
 function buildPresets(){
-  $('#presets').innerHTML=PRESETS.map((p,i)=>`<button class="preset ${i===target?'on':''}" data-i="${i}">${p.n}</button>`).join('');
+  $('#presets').innerHTML=AVAL_PRESETS.map((p,i)=>`<button class="preset ${i===target?'on':''}" data-i="${i}">${p.n}</button>`).join('');
   $('#presets').querySelectorAll('.preset').forEach(b=>b.onclick=()=>{target=+b.dataset.i; buildPresets(); render();});
 }
 function buildVols(){
@@ -201,7 +201,7 @@ function dropsFor(ionMM, deficit){
 }
 function render(){
   evaluate();
-  const p=PRESETS[target].v;
+  const p=AVAL_PRESETS[target].v;
   const tMg=p.mg, tCa=p.ca, tHco3=(p.k/ION.k + p.na/ION.na)*ION.hco3;
   const gh=ghF(water.ca,water.mg), kh=khF(water.hco3);
 

@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mineralização da água · café</title>
+<meta name="description" content="Remineralize água destilada/osmose para café especial: perfis prontos, gotas por volume e a receita das soluções-mãe. Sem instalar nada.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 3C10 12 7 16 7 21a9 9 0 0 0 18 0c0-5-3-9-9-18z' fill='%237A4B22'/></svg>">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mineralização da água para café">
+<meta property="og:description" content="Calcule a receita das soluções-mãe e quantas gotas pingar por volume. Perfis prontos para coado e espresso.">
+<meta property="og:url" content="https://diogofrj.github.io/agua-cafe/index.html">
+<meta property="og:image" content="https://diogofrj.github.io/agua-cafe/labels/magnesio.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
@@ -46,7 +54,7 @@ h1 em{font-style:italic; color:var(--coffee)}
 .mname{font-weight:500; font-size:15px; flex:none; width:78px}
 .mform{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink3); flex:none; width:96px; display:none}
 @media(min-width:620px){.mform{display:block}}
-input[type=range]{-webkit-appearance:none; appearance:none; flex:1; height:4px; border-radius:2px; background:var(--surf2); outline:none}
+input[type=range]{-webkit-appearance:none; appearance:none; flex:1; min-width:0; height:4px; border-radius:2px; background:var(--surf2); outline:none}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--ink); cursor:pointer; border:3px solid var(--surf)}
 input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; background:var(--ink); cursor:pointer; border:3px solid var(--surf)}
 .ppmbox{display:flex; align-items:baseline; gap:3px; flex:none; width:72px; justify-content:flex-end}
@@ -62,7 +70,7 @@ input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; 
 .volcustom:focus{outline:none; border-color:var(--ink)}
 
 .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
-.stat{background:var(--surf2); border-radius:var(--rs); padding:13px 14px}
+.stat{background:var(--surf2); border-radius:var(--rs); padding:13px 14px; min-width:0}
 .stat .k{font-size:11px; font-family:'JetBrains Mono',monospace; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2)}
 .stat .v{font-family:'Fraunces',serif; font-size:26px; font-weight:500; line-height:1.1; margin-top:3px}
 .stat .u{font-size:11px; color:var(--ink3); font-family:'JetBrains Mono',monospace}
@@ -99,6 +107,17 @@ td.pip{color:var(--coffee)}
 .advgrid input:focus{outline:none; border-color:var(--ink)}
 .foot{font-size:12px; color:var(--ink3); margin-top:22px; line-height:1.6; text-align:center}
 .note{font-size:12.5px; color:var(--ink2); margin-top:10px; line-height:1.55}
+.actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px}
+.abtn{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.04em; color:var(--ink2); background:transparent; border:1px solid var(--line2); border-radius:99px; padding:7px 13px; cursor:pointer}
+.abtn:hover{background:var(--surf2)}
+@media print{
+  @page{ margin:12mm; }
+  body{ background:#fff; background-image:none; }
+  .wrap{ max-width:none; margin:0; padding:0; }
+  nav,.no-print,.actions,.adv{ display:none !important; }
+  .card{ break-inside:avoid; border-color:#ccc; }
+  header{ margin-bottom:14px; }
+}
 </style>
 </head>
 <body>
@@ -113,21 +132,25 @@ td.pip{color:var(--coffee)}
   <div class="kicker">Água destilada → café</div>
   <h1>Mineralização <em>por gotas</em></h1>
   <p class="sub">Defina o perfil, escolha o volume da extração e o portal calcula a receita das soluções-mãe e quantas gotas pingar. A solução é fixa — serve para qualquer volume.</p>
+  <div class="actions">
+    <button class="abtn" id="sharebtn">🔗 Copiar link da receita</button>
+    <button class="abtn" id="printbtn">🖨 Imprimir receita</button>
+  </div>
 </header>
 
-<div class="card">
+<div class="card no-print">
   <div class="label">Perfil alvo</div>
   <div class="presets" id="presets"></div>
   <p class="note" id="presetdesc" style="margin-top:12px"></p>
 </div>
 
-<div class="card">
+<div class="card no-print">
   <div class="label">Concentração desejada (ppm dos íons)</div>
   <div id="minerals"></div>
   <div class="warn" id="alkwarn"><b>Sódio e Potássio são os dois bicarbonatos</b> — somam alcalinidade. Os dois juntos dobram o buffer e achatam a acidez. Use um ou divida entre os dois.</div>
 </div>
 
-<div class="card">
+<div class="card no-print">
   <div class="label">Volume da extração</div>
   <div class="vols" id="vols"></div>
 </div>
@@ -160,9 +183,9 @@ td.pip{color:var(--coffee)}
   <details class="adv">
     <summary>Ajustes avançados</summary>
     <div class="advgrid">
-      <div><label>Volume da gota (mL)</label><input id="dropv" type="number" step="0.001" value="0.062"></div>
-      <div><label>Volume da solução (mL)</label><input id="stockv" type="number" step="1" value="100"></div>
-      <div><label>Concentração da solução (mol/L)</label><input id="stockm" type="number" step="0.05" value="0.5"></div>
+      <div><label for="dropv">Volume da gota (mL)</label><input id="dropv" type="number" step="0.001" min="0.001" value="0.062"></div>
+      <div><label for="stockv">Volume da solução (mL)</label><input id="stockv" type="number" step="1" min="1" value="100"></div>
+      <div><label for="stockm">Concentração da solução (mol/L)</label><input id="stockm" type="number" step="0.05" min="0.01" value="0.5"></div>
       <div style="display:flex; align-items:flex-end"><span class="note" id="dropinfo"></span></div>
     </div>
   </details>
@@ -171,25 +194,11 @@ td.pip{color:var(--coffee)}
 <p class="foot">Minerais: MgSO₄·7H₂O · CaCl₂·2H₂O · NaHCO₃ · KHCO₃ · base água destilada/osmose.<br>O sulfato de cálcio (gesso) ficou de fora: solubilidade ~2,4 g/L, não vira solução-mãe estável.</p>
 </div>
 
+<script src="data.js"></script>
 <script>
-const M={
-  mg:{name:'Magnésio',salt:'MgSO₄·7H₂O',mmSalt:246.47,mmIon:24.305,color:'var(--mg)',max:30},
-  ca:{name:'Cálcio',salt:'CaCl₂·2H₂O',mmSalt:147.01,mmIon:40.078,color:'var(--ca)',max:40},
-  na:{name:'Sódio',salt:'NaHCO₃',mmSalt:84.007,mmIon:22.990,color:'var(--na)',max:30},
-  k:{name:'Potássio',salt:'KHCO₃',mmSalt:100.115,mmIon:39.098,color:'var(--k)',max:60},
-};
-const KEYS=['mg','ca','na','k'];
-const PRESETS=[
-  {n:'Doçura & acidez',d:'Magnésio dominante, buffer baixo — acidez expressiva, doce.',v:{mg:12,ca:4,na:0,k:22.4}},
-  {n:'Equilibrado',d:'Corpo e acidez em equilíbrio, buffer médio.',v:{mg:7,ca:17,na:0,k:30}},
-  {n:'Brilhante / leve',d:'TDS baixo, muito limpo e ácido.',v:{mg:10,ca:2,na:0,k:12}},
-  {n:'Encorpado',d:'Cálcio alto, corpo pesado, acidez contida.',v:{mg:8,ca:25,na:0,k:35}},
-  {n:'☕ Espresso doce & encorpado',d:'Sem cálcio: zero cloreto → menos corrosão e sem calcário duro. Doçura do magnésio, corpo do sódio, buffer médio que protege a máquina.',v:{mg:15,ca:0,na:10,k:16}},
-  {n:'Álvaro 10·10·5·5',d:'O exemplo da calculadora original, para comparar.',v:{mg:10,ca:10,na:5,k:5}},
-];
-const VOLS=[300,400,450,500,600,800,1000,2000,5000];
+// M, KEYS, PRESETS, VOLS, STOCKM, DROPV vêm de data.js (fonte única).
 
-let state={ppm:{...PRESETS[0].v}, vol:500, dropv:0.062, stockv:100, stockm:0.5, preset:0, customVol:false, showAll:false};
+let state={ppm:{...PRESETS[0].v}, vol:500, dropv:DROPV, stockv:100, stockm:STOCKM, preset:0, customVol:false, showAll:false};
 
 const $=s=>document.querySelector(s);
 const r1=x=>Math.round(x*10)/10;
@@ -226,10 +235,10 @@ function buildMinerals(){
     const m=M[k];
     return `<div class="row">
       <span class="dot" style="background:${m.color}"></span>
-      <span class="mname">${m.name}</span>
+      <span class="mname" id="mname-${k}">${m.name}</span>
       <span class="mform">${m.salt}</span>
-      <input type="range" min="0" max="${m.max}" step="0.5" value="${state.ppm[k]}" data-k="${k}" class="sl">
-      <span class="ppmbox"><input class="ppmin num" data-k="${k}" value="${r1(state.ppm[k])}"><span class="unit">ppm</span></span>
+      <input type="range" min="0" max="${m.max}" step="0.5" value="${state.ppm[k]}" data-k="${k}" class="sl" aria-labelledby="mname-${k}">
+      <span class="ppmbox"><input class="ppmin num" data-k="${k}" value="${r1(state.ppm[k])}" inputmode="decimal" aria-label="${m.name} em ppm"><span class="unit">ppm</span></span>
     </div>`;
   }).join('');
   $('#minerals').querySelectorAll('.sl').forEach(s=>s.oninput=()=>{
@@ -237,6 +246,7 @@ function buildMinerals(){
   });
   $('#minerals').querySelectorAll('.ppmin').forEach(inp=>inp.oninput=()=>{
     let v=parseFloat(inp.value); if(isNaN(v))v=0;
+    v=Math.max(0,Math.min(999,v));
     state.ppm[inp.dataset.k]=v; state.preset=-1;
     const sl=$(`.sl[data-k="${inp.dataset.k}"]`); if(sl)sl.value=v;
     renderOutputs(); markPreset();
@@ -251,7 +261,7 @@ function markPreset(){
 function buildVols(){
   $('#vols').innerHTML=VOLS.map(v=>
     `<button class="vol ${state.vol===v&&!state.customVol?'on':''}" data-v="${v}">${v>=1000?(v/1000)+' L':v+' ml'}</button>`).join('')
-    +`<input class="volcustom num" id="vc" placeholder="outro ml" value="${state.customVol?state.vol:''}">`;
+    +`<input class="volcustom num" id="vc" placeholder="outro ml" aria-label="Volume personalizado em ml" inputmode="numeric" value="${state.customVol?state.vol:''}">`;
   $('#vols').querySelectorAll('.vol').forEach(b=>b.onclick=()=>{
     state.vol=+b.dataset.v; state.customVol=false; $('#vc').value=''; renderOutputs(); buildVols();
   });
@@ -324,15 +334,43 @@ function renderOutputs(){
   renderStats(); renderDoses(); renderTable(); renderRecipes();
   const dpm=Math.round(1/state.dropv);
   $('#dropinfo').textContent=`≈ ${dpm} gotas por mL · 1 gota adiciona ${r1(state.stockm*state.dropv/(state.vol/1000)*1000)/1000} mmol/L`;
+  writeHash();
 }
 function renderAll(){buildPresets(); buildMinerals(); buildVols(); renderOutputs();}
 
-$('#dropv').oninput=e=>{state.dropv=parseFloat(e.target.value)||0.062; renderOutputs();};
-$('#stockv').oninput=e=>{state.stockv=parseFloat(e.target.value)||100; renderOutputs();};
-$('#stockm').oninput=e=>{state.stockm=parseFloat(e.target.value)||0.5; renderOutputs();};
+// --- link compartilhável: estado no #hash da URL ---
+function writeHash(){
+  const p=state.ppm;
+  const h=`mg=${r1(p.mg)}&ca=${r1(p.ca)}&na=${r1(p.na)}&k=${r1(p.k)}&v=${state.vol}`;
+  history.replaceState(null,'','#'+h);
+}
+function readHash(){
+  if(!location.hash) return false;
+  const q=new URLSearchParams(location.hash.slice(1));
+  let any=false;
+  KEYS.forEach(k=>{ if(q.has(k)){ const v=parseFloat(q.get(k)); if(!isNaN(v)){ state.ppm[k]=Math.max(0,Math.min(999,v)); any=true; } } });
+  if(q.has('v')){ const v=parseInt(q.get('v'),10); if(!isNaN(v)&&v>0){ state.vol=v; state.customVol=!VOLS.includes(v); } }
+  if(any) state.preset=-1;
+  return any;
+}
+
+$('#dropv').oninput=e=>{state.dropv=Math.max(0.001,parseFloat(e.target.value)||DROPV); renderOutputs();};
+$('#stockv').oninput=e=>{state.stockv=Math.max(1,parseFloat(e.target.value)||100); renderOutputs();};
+$('#stockm').oninput=e=>{state.stockm=Math.max(0.01,parseFloat(e.target.value)||STOCKM); renderOutputs();};
 $('#kit').onchange=e=>{state.showAll=e.target.checked; renderRecipes();};
 
+$('#printbtn').onclick=()=>window.print();
+$('#sharebtn').onclick=async()=>{
+  writeHash();
+  const btn=$('#sharebtn'), orig=btn.textContent;
+  try{ await navigator.clipboard.writeText(location.href); btn.textContent='✓ Link copiado'; }
+  catch(_){ btn.textContent='Copie da barra de endereço'; }
+  setTimeout(()=>btn.textContent=orig,1800);
+};
+
+readHash();
 renderAll();
+window.addEventListener('hashchange',()=>{ if(readHash()) renderAll(); });
 </script>
 </body>
 </html>
