@@ -69,6 +69,13 @@ Para regerar os PNGs: `pip install pillow` e `python labels.py`. Na primeira
 execução o script baixa as fontes (Zilla Slab + DejaVu Sans Mono) para `fonts/`;
 as massas dos sais são calculadas a partir das mesmas constantes do portal.
 
+## Desenvolvimento
+
+Vanilla, sem build. As constantes de química e os perfis ficam em `data.js`
+(fonte única). Para o padrão de ambiente (Python via WSL, validação com Chrome
+headless, publicação) e as regras do projeto, veja `AGENTS.md`. Para encerrar um
+trabalho de forma consistente, use o comando `/finalizar` (no Claude Code).
+
 ## Crédito
 
 Engenharia reversa inspirada na calculadora de Álvaro Magri

@@ -4,20 +4,33 @@ Site estático e sem dependências para mineralizar água destilada/osmose para 
 
 ## Rodar / publicar
 - Pré-visualizar: abra qualquer `.html` direto no navegador, ou `python3 -m http.server` e acesse http://localhost:8000
-- Publicar: push na `main` → GitHub Pages serve a partir da raiz (`/`).
+- Publicar: ao terminar, **sempre** `commit` + `push` na `main` → GitHub Pages serve a partir da raiz (`/`) e republica sozinho.
+
+## Ambiente de desenvolvimento (qualquer máquina ou modelo)
+Padrão para uma nova sessão/modelo retomar sem atrito:
+- **Python roda pelo WSL**, não pelo `python` nativo do Windows (costuma ser só o stub da Microsoft Store). Ex.: `wsl bash -lc "cd /mnt/c/.../agua-cafe && python3 labels.py"`. Pillow: `pip install --user --break-system-packages Pillow` (PEP 668 bloqueia o pip simples).
+- **Validar o visual sem abrir o navegador**: Chrome headless.
+  - Screenshot: `chrome --headless=new --screenshot=out.png "--window-size=W,H" file:///.../pagina.html`
+  - Impressão (aplica `@media print`): `--print-to-pdf=out.pdf`; rasterize com `pdftoppm` (poppler, no WSL).
+  - ⚠ Em telas Windows a 125%, o viewport CSS do headless sai ~1,25× a largura da janela e a captura **corta a direita** — é artefato, não overflow. Para checar overflow de verdade, meça `document.documentElement.scrollWidth === clientWidth`.
+- **Finalizar a sessão**: rode `/finalizar` (atualiza docs → valida → commit+push). Definição em `.claude/commands/finalizar.md`.
 
 ## NÃO faça
 - Não adicione framework, bundler, npm ou etapa de build. Mantenha vanilla.
 - Não unifique o CSS num arquivo compartilhado — cada página carrega o próprio `<style>` de propósito, para abrir sozinha via `file://`.
+- Não duplique as constantes de química/perfis nos HTMLs — elas vivem em `data.js` (o `labels.py` só repete as massas dos sais). Mudou calibração/perfil/massa? Mude em `data.js`.
 - Não busque preços ao vivo de Shopee/iHerb (CORS + anti-bot). Os preços do `kit.html` são snapshots manuais e datados. Nunca invente nem faça scraping de preço.
+- Não afirme que os links do `kit.html` não são patrocinados — há links de afiliado (Shopee/iHerb). Use disclosure honesto.
 - Não reintroduza diluição no avaliador (ver regras de química).
 
 ## Arquivos
 - `index.html` — construir do zero (presets + ppm livre → receita das soluções + gotas).
 - `kit.html` — lista de compras (minerais, equipamentos, preços, links). Conteúdo estático.
 - `avaliador.html` — avaliar rótulo de água mineral e corrigir até o alvo (sem diluir).
-- `labels.py` — gera os 4 PNGs de etiqueta (Pillow + fontes Zilla Slab).
-- `labels/` — PNGs gerados.
+- `etiquetas.html` — escolher tamanho/cópias e imprimir as etiquetas (com linhas de corte) para colar nos frascos.
+- `data.js` — fonte única de massas molares, calibração e perfis; carregado por `index.html` e `avaliador.html` **antes** do script inline.
+- `labels.py` — gera os 4 PNGs de etiqueta (Pillow; baixa as fontes sozinho na 1ª execução).
+- `labels/` — PNGs gerados. `fonts/` — TTFs baixadas (no `.gitignore`).
 
 ## Modelo de química (a UI depende disto — não altere sem motivo)
 Soluções-mãe a **0,5 mol/L**. Gota = **0,062 mL** (calibrado em 17 gotas/mL).
@@ -25,6 +38,7 @@ Cada gota adiciona `STOCKM*DROPV` mmol do íon (= 0,031 mmol).
 
 Massas molares (g/mol) — íons: Mg 24,305 · Ca 40,078 · Na 22,990 · K 39,098 · HCO₃ 61,017 · SO₄ 96,06 · Cl 35,453.
 Sais: MgSO₄·7H₂O 246,47 · CaCl₂·2H₂O 147,01 · NaHCO₃ 84,007 · KHCO₃ 100,115.
+Estes números vivem em `data.js` (fonte única dos HTMLs); o `labels.py` repete só as massas dos sais e calcula as gramas a partir delas.
 
 Fórmulas:
 - `gotas = (ppm_íon / MM_íon × volume_L) / (STOCKM × DROPV)`
