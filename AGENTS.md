@@ -26,7 +26,7 @@ Padrão para uma nova sessão/modelo retomar sem atrito:
 
 ## Arquivos
 - `index.html` — construir do zero (presets + ppm livre → receita das soluções + gotas). Estado no `#hash` (compartilhável); último perfil/volume lembrado em `localStorage` (`aguacafe.index`).
-- `recomendador.html` — escolher um café (ou montar por processo+torra) → alvo de água sob medida, gotas e aptidão (espresso/coado). Linka de volta ao `index.html` via `#hash`. Tem hash próprio compartilhável (`#cafe=<id>` ou `#proc=…&torra=…`, mais `a/c/ar/v`) e cafés do usuário em `localStorage` (`aguacafe.cafes`; o ajuste de eixos fica gravado no café custom).
+- `recomendador.html` — escolher um café (ou montar por processo+torra) → alvo de água sob medida, gotas e aptidão (espresso/coado). Linka de volta ao `index.html` via `#hash`. Tem hash próprio compartilhável (`#cafe=<id>` ou `#proc=…&torra=…`, mais `a/c/ar/v`) e cafés do usuário em `localStorage` (`aguacafe.cafes`; o ajuste de eixos fica gravado no café custom). Backup: exportar/importar JSON (merge por id) e **merge de planilha pública do Google** (link "Publicar na web" em CSV, lembrado em `aguacafe.sheet`; id derivado de nome+torrefador; linha sem eixos preserva o ajuste local). A planilha só funciona via http(s) — `file://` bloqueia o fetch.
 - `kit.html` — lista de compras (minerais, equipamentos, preços, links). Conteúdo estático.
 - `avaliador.html` — avaliar rótulo de água mineral e corrigir até o alvo (sem diluir). Os "exemplos" são **arquétipos ilustrativos**, não marcas — não cadastre rótulos de marcas reais sem fonte.
 - `etiquetas.html` — escolher tamanho/cópias e imprimir as etiquetas (com linhas de corte) para colar nos frascos.
@@ -62,6 +62,7 @@ Quem decide a água é o **processo + torra**, NÃO a variedade (o mesmo Mundo N
 - `Mg = 5 + 4·a + 4·ar` (acidez e aroma) · `Ca = 2 + 23·c` (corpo) · `K = max(6, 14 + 22·c − 8·a − 6·ar)` (buffer sobe com corpo, desce com acidez/aroma). `a,c,ar` = eixos/10.
 - Coeficientes calibrados para os extremos baterem com os `PRESETS` do `data.js`. Mexeu nos presets? Reconfira os extremos aqui.
 - Sódio fica 0 (é a alavanca do espresso, não do coado). Espresso é só um **selo de aptidão** (`aptidao()`), não um segundo caminho químico — para a água de espresso, manda pro perfil Espresso do `index.html`.
+- `PROCESSOS` vai do lavado ao descafeinado. Os fermentados específicos (anaeróbico, carbônica, láctica, koji) têm DNA próprio e a família inteira (lista `FERMENTADOS`, inclui o `fermentado` genérico) recebe o −2 de aptidão para espresso; `dupla` fica de fora (fermentação de limpeza). **Não renomeie chaves existentes** — cafés salvos no `localStorage` referenciam essas chaves.
 - Eixos por café são editáveis na UI (override): o processo dá o ponto de partida, o usuário corrige se o pacote surpreender.
 
 ## Regras de química (regressão aqui = bug — `tests.html` cobre as testáveis)
