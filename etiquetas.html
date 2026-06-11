@@ -6,6 +6,14 @@
 <title>Imprimir etiquetas · água para café</title>
 <meta name="description" content="Imprima as etiquetas dos frascos de solução-mãe no tamanho certo para recortar e colar em cada conta-gotas.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 3C10 12 7 16 7 21a9 9 0 0 0 18 0c0-5-3-9-9-18z' fill='%237A4B22'/></svg>">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F2ECE0">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Imprimir etiquetas · água para café">
+<meta property="og:description" content="Imprima as etiquetas dos frascos de solução-mãe no tamanho certo para recortar e colar em cada conta-gotas.">
+<meta property="og:url" content="https://diogofrj.github.io/agua-cafe/etiquetas.html">
+<meta property="og:image" content="https://diogofrj.github.io/agua-cafe/labels/magnesio.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 :root{
@@ -13,13 +21,23 @@
   --ink:#2B211A; --ink2:#6E6053; --ink3:#9C8E7E;
   --line:rgba(43,33,26,.13); --line2:rgba(43,33,26,.28);
   --mg:#1E6F8E; --ca:#3F7D43; --na:#C07A2B; --k:#B0463A; --coffee:#7A4B22;
+  --dots:rgba(43,33,26,.035);
   --r:12px; --rs:8px;
   --lw:61mm;            /* largura física de cada etiqueta na impressão */
   --gap:6mm;           /* espaço entre etiquetas */
+  color-scheme:light;
+}
+html[data-theme=dark]{
+  --paper:#1B1511; --surf:#241D17; --surf2:#312822;
+  --ink:#EDE4D6; --ink2:#B3A492; --ink3:#857665;
+  --line:rgba(237,228,214,.13); --line2:rgba(237,228,214,.3);
+  --mg:#3E9DC2; --ca:#69AC6F; --na:#D69A52; --k:#CE7164; --coffee:#C98F55;
+  --dots:rgba(237,228,214,.04);
+  color-scheme:dark;
 }
 *{box-sizing:border-box; margin:0; padding:0}
 body{background:var(--paper); color:var(--ink); font-family:'Hanken Grotesk',sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(rgba(43,33,26,.035) 1px,transparent 1px); background-size:22px 22px}
+  background-image:radial-gradient(var(--dots) 1px,transparent 1px); background-size:22px 22px}
 .wrap{max-width:860px; margin:0 auto; padding:22px 18px 64px}
 .nav{display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap}
 .nav a{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; text-decoration:none; color:var(--ink2); border:1px solid var(--line2); padding:7px 13px; border-radius:99px}
@@ -30,6 +48,7 @@ h1{font-family:'Fraunces',serif; font-weight:500; font-size:32px; line-height:1.
 h1 em{font-style:italic; color:var(--coffee)}
 .sub{color:var(--ink2); font-size:14.5px; margin-top:8px; max-width:62ch}
 .disc{background:#F6E9D6; border:1px solid #E0C597; border-radius:var(--rs); padding:11px 14px; font-size:12.5px; color:#6B4A18; margin-bottom:18px}
+html[data-theme=dark] .disc{background:#3A2D17; border-color:#7A5E2B; color:#EAC988}
 
 /* controles */
 .controls{background:var(--surf); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px; margin-bottom:22px; display:flex; flex-wrap:wrap; gap:20px 28px; align-items:flex-end}
@@ -66,6 +85,7 @@ h1 em{font-style:italic; color:var(--coffee)}
   .label img{ image-rendering:auto; }
 }
 </style>
+<script src="theme.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -75,6 +95,7 @@ h1 em{font-style:italic; color:var(--coffee)}
   <a href="kit.html">Monte seu kit</a>
   <a href="avaliador.html">Corrigir água mineral</a>
   <a href="etiquetas.html" class="on">Etiquetas</a>
+  <button id="themebtn" style="margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; color:var(--ink2); background:transparent; border:1px solid var(--line2); padding:7px 13px; border-radius:99px; cursor:pointer"></button>
 </nav>
 <header>
   <div class="kicker">Imprimir etiquetas</div>

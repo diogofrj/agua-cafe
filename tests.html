@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testes da química · água para café</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 3C10 12 7 16 7 21a9 9 0 0 0 18 0c0-5-3-9-9-18z' fill='%237A4B22'/></svg>">
+<style>
+:root{--paper:#F2ECE0; --surf:#FAF6EE; --ink:#2B211A; --ink2:#6E6053; --line:rgba(43,33,26,.13);
+  --good:#3F7D43; --bad:#B0463A; --coffee:#7A4B22; color-scheme:light}
+html[data-theme=dark]{--paper:#1B1511; --surf:#241D17; --ink:#EDE4D6; --ink2:#B3A492;
+  --line:rgba(237,228,214,.13); --good:#69AC6F; --bad:#CE7164; --coffee:#C98F55; color-scheme:dark}
+html[data-theme=dark] #summary.ok{background:#1F3320; color:#9FCB9A}
+html[data-theme=dark] #summary.fail{background:#3B1F1A; color:#E5A294}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper); color:var(--ink); font-family:'Hanken Grotesk',system-ui,sans-serif; font-size:15px; line-height:1.6}
+.wrap{max-width:760px; margin:0 auto; padding:28px 18px 64px}
+h1{font-size:24px; font-weight:600; margin-bottom:4px}
+.sub{color:var(--ink2); font-size:13.5px; margin-bottom:20px}
+#summary{font-family:monospace; font-size:15px; font-weight:700; padding:10px 14px; border-radius:8px; margin-bottom:18px}
+#summary.ok{background:#E1F0DF; color:#2C5A2F} #summary.fail{background:#F3DAD5; color:#7E2A1E}
+.grp{font-family:monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink2); margin:18px 0 6px}
+.t{font-family:monospace; font-size:13px; padding:5px 0 5px 26px; position:relative; border-top:1px dashed var(--line)}
+.t:before{position:absolute; left:4px; font-weight:700}
+.t.pass:before{content:'✓'; color:var(--good)} .t.fail:before{content:'✗'; color:var(--bad)}
+.t.fail{color:var(--bad)}
+.t .got{color:var(--ink2)}
+</style>
+<script src="theme.js"></script>
+</head>
+<body>
+<div class="wrap">
+<h1>Testes da química</h1>
+<p class="sub">Invariantes de <code>data.js</code> + <code>cafes.js</code> (regressão aqui = bug, ver <code>AGENTS.md</code>). Abra direto via <code>file://</code> — sem build, sem dependência.</p>
+<div id="summary"></div>
+<div id="out"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="cafes.js"></script>
+<script>
+const out=document.getElementById('out');
+let pass=0, fail=0;
+function grp(n){ const d=document.createElement('div'); d.className='grp'; d.textContent=n; out.appendChild(d); }
+function t(name, cond, got){
+  const d=document.createElement('div');
+  d.className='t '+(cond?'pass':'fail');
+  d.innerHTML=name+(cond?'':' <span class="got">— obtido: '+got+'</span>');
+  out.appendChild(d);
+  cond?pass++:fail++;
+}
+const near=(a,b,tol=0.001)=>Math.abs(a-b)<=tol;
+
+grp('Calibração das soluções-mãe');
+t('1 gota = 0,031 mmol (STOCKM × DROPV)', near(STOCKM*DROPV,0.031,1e-9), STOCKM*DROPV);
+t('Massa do frasco de Mg: 12,32 g / 100 mL', near(STOCKM*0.1*SALT_MM.mg,12.32,0.005), (STOCKM*0.1*SALT_MM.mg).toFixed(4));
+t('Massa do frasco de Ca: 7,35 g / 100 mL', near(STOCKM*0.1*SALT_MM.ca,7.35,0.005), (STOCKM*0.1*SALT_MM.ca).toFixed(4));
+t('Massa do frasco de Na: 4,20 g / 100 mL', near(STOCKM*0.1*SALT_MM.na,4.20,0.005), (STOCKM*0.1*SALT_MM.na).toFixed(4));
+t('Massa do frasco de K: 5,01 g / 100 mL', near(STOCKM*0.1*SALT_MM.k,5.01,0.005), (STOCKM*0.1*SALT_MM.k).toFixed(4));
+
+grp('Fatores GH / KH derivados das massas molares');
+t('Fator GH do Mg ≈ 4,118', near(GH_MG,4.118,0.001), GH_MG.toFixed(5));
+t('Fator GH do Ca ≈ 2,497', near(GH_CA,2.497,0.001), GH_CA.toFixed(5));
+t('Fator KH do HCO₃ ≈ 0,8201', near(KH_HCO3,0.8201,0.0005), KH_HCO3.toFixed(5));
+t('ghPpm(10, 10) = 66,15', near(ghPpm(10,10),66.15,0.01), ghPpm(10,10).toFixed(3));
+t('1 mmol de Na (22,99 ppm) gera 1 mmol de HCO₃ (61,017 mg/L)', near(hco3FromCations(ION_MM.na,0),ION_MM.hco3,0.001), hco3FromCations(ION_MM.na,0).toFixed(3));
+t('1 mmol de K (39,098 ppm) gera 1 mmol de HCO₃', near(hco3FromCations(0,ION_MM.k),ION_MM.hco3,0.001), hco3FromCations(0,ION_MM.k).toFixed(3));
+
+grp('Gotas ↔ ppm (funções inversas)');
+{
+  const ex=dropsExact(12,ION_MM.mg,500);
+  t('ppmFromDrops desfaz dropsExact (Mg 12 ppm, 500 mL)', near(ppmFromDrops(ex,ION_MM.mg,500),12,1e-9), ppmFromDrops(ex,ION_MM.mg,500));
+  t('dropsExact dobra com o volume', near(dropsExact(12,ION_MM.mg,1000),2*ex,1e-9), dropsExact(12,ION_MM.mg,1000));
+}
+
+grp('Perfis (PRESETS)');
+{
+  const esp=PRESETS.find(p=>p.n.includes('Espresso'));
+  t('Existe um perfil de espresso', !!esp, '—');
+  t('Espresso sem cálcio (cloreto corrói, cálcio incrusta)', esp && esp.v.ca===0, esp&&esp.v.ca);
+  t('Todo preset tem os 4 íons ≥ 0', PRESETS.every(p=>KEYS.every(k=>p.v[k]>=0)), '—');
+  t('TDS de todo preset entre 30 e 250 mg/L', PRESETS.every(p=>{const x=tdsOf(p.v); return x>30&&x<250;}), PRESETS.map(p=>tdsOf(p.v).toFixed(0)).join(', '));
+}
+
+grp('Motor café → água (alvoPpm)');
+{
+  const enc=PRESETS.find(p=>p.n==='Encorpado'), bri=PRESETS.find(p=>p.n==='Brilhante / leve');
+  t('Corpo 10 → Ca igual ao preset Encorpado (25)', enc && alvoPpm({acidez:0,corpo:10,aroma:0}).ca===enc.v.ca, alvoPpm({acidez:0,corpo:10,aroma:0}).ca);
+  t('Corpo 0 → Ca igual ao preset Brilhante/leve (2)', bri && alvoPpm({acidez:10,corpo:0,aroma:0}).ca===bri.v.ca, alvoPpm({acidez:10,corpo:0,aroma:0}).ca);
+  const corners=[];
+  for(const a of [0,10]) for(const c of [0,10]) for(const ar of [0,10]) corners.push(alvoPpm({acidez:a,corpo:c,aroma:ar}));
+  t('Sódio sempre 0 no coado (alavanca do espresso)', corners.every(p=>p.na===0), '—');
+  t('Buffer nunca abaixo do piso (K ≥ 6)', corners.every(p=>p.k>=6), corners.map(p=>p.k).join(', '));
+  t('Eixos fora da escala são recortados (entrada 99 = entrada 10)', JSON.stringify(alvoPpm({acidez:99,corpo:99,aroma:99}))===JSON.stringify(alvoPpm({acidez:10,corpo:10,aroma:10})), '—');
+}
+
+grp('Processos, torras e banco de cafés');
+{
+  const combos=[];
+  for(const p of Object.keys(PROCESSOS)) for(const tr of Object.keys(TORRAS)) combos.push(baselineEixos(p,tr));
+  t('baselineEixos sempre dentro de 0–10', combos.every(e=>[e.acidez,e.corpo,e.aroma].every(x=>x>=0&&x<=10)), '—');
+  t('IDs dos cafés são únicos', new Set(CAFES.map(c=>c.id)).size===CAFES.length, '—');
+  t('Todo café tem processo e torra válidos', CAFES.every(c=>PROCESSOS[c.processo]&&TORRAS[c.torra]), '—');
+  t('Eixos de todo café dentro de 0–10', CAFES.every(c=>[c.acidez,c.corpo,c.aroma].every(x=>x>=0&&x<=10)), '—');
+  t('aptidao() responde para todo café', CAFES.every(c=>['espresso','coado','versatil'].includes(aptidao(c).nivel)), '—');
+  const choc=CAFES.find(c=>c.id==='mr-chocolate'), koji=CAFES.find(c=>c.id==='crazy-koji');
+  t('Encorpado de baixa acidez (Mr. Chocolate) → selo espresso', choc && aptidao(choc).nivel==='espresso', choc&&aptidao(choc).nivel);
+  t('Fermentado ácido/aromático (Crazy Koji) → melhor coado', koji && aptidao(koji).nivel==='coado', koji&&aptidao(koji).nivel);
+}
+
+const s=document.getElementById('summary');
+s.className=fail?'fail':'ok';
+s.textContent=fail?`✗ ${fail} falha(s) · ${pass} ok`:`✓ ${pass} testes, tudo ok`;
+document.title=(fail?`✗ ${fail} falhas`:'✓ ok')+' · testes da química';
+</script>
+</body>
+</html>

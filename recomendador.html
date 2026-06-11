@@ -6,6 +6,14 @@
 <title>Café → água ideal · recomendador</title>
 <meta name="description" content="Escolha um café (ou monte por processo e torra) e receba o perfil de água sob medida — quantas gotas de cada mineral e o método de preparo.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 3C10 12 7 16 7 21a9 9 0 0 0 18 0c0-5-3-9-9-18z' fill='%237A4B22'/></svg>">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F2ECE0">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Café → água ideal · recomendador">
+<meta property="og:description" content="Escolha um café (ou monte por processo e torra) e receba o perfil de água sob medida — gotas por mineral e aptidão espresso/coado.">
+<meta property="og:url" content="https://diogofrj.github.io/agua-cafe/recomendador.html">
+<meta property="og:image" content="https://diogofrj.github.io/agua-cafe/labels/potassio.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
@@ -15,14 +23,25 @@
   --line:rgba(43,33,26,.13); --line2:rgba(43,33,26,.28);
   --mg:#1E6F8E; --ca:#3F7D43; --na:#C07A2B; --k:#B0463A;
   --coffee:#7A4B22;
+  --dots:rgba(43,33,26,.035);
   --r:12px; --rs:8px;
+  color-scheme:light;
+}
+html[data-theme=dark]{
+  --paper:#1B1511; --surf:#241D17; --surf2:#312822;
+  --ink:#EDE4D6; --ink2:#B3A492; --ink3:#857665;
+  --line:rgba(237,228,214,.13); --line2:rgba(237,228,214,.3);
+  --mg:#3E9DC2; --ca:#69AC6F; --na:#D69A52; --k:#CE7164;
+  --coffee:#C98F55;
+  --dots:rgba(237,228,214,.04);
+  color-scheme:dark;
 }
 *{box-sizing:border-box; margin:0; padding:0}
 body{
   background:var(--paper); color:var(--ink);
   font-family:'Hanken Grotesk',sans-serif; font-size:16px; line-height:1.6;
   -webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(rgba(43,33,26,.035) 1px,transparent 1px);
+  background-image:radial-gradient(var(--dots) 1px,transparent 1px);
   background-size:22px 22px;
 }
 .wrap{max-width:860px; margin:0 auto; padding:28px 18px 64px}
@@ -71,6 +90,8 @@ input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; 
 .badge.espresso{background:#F0E6D2; border-color:#D9B97E; color:#6B4A18}
 .badge.coado{background:#E4ECE0; border-color:#A7C49C; color:#3a5a32}
 .badge.versatil{background:var(--surf2); color:var(--ink2)}
+html[data-theme=dark] .badge.espresso{background:#3A2D17; border-color:#8A6C33; color:#EAC988}
+html[data-theme=dark] .badge.coado{background:#22301F; border-color:#4E6B45; color:#A9C99C}
 
 .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
 .stat{background:var(--surf2); border-radius:var(--rs); padding:13px 14px; min-width:0}
@@ -89,12 +110,31 @@ input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; 
 .warn{background:#F6E9D6; border:1px solid #E0C597; border-radius:var(--rs); padding:11px 14px; font-size:13px; color:#6B4A18; margin-top:14px; display:none}
 .warn.show{display:block}
 .warn b{font-weight:600}
+html[data-theme=dark] .warn{background:#3A2D17; border-color:#7A5E2B; color:#EAC988}
 
 .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px}
 .abtn{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.04em; color:var(--ink2); background:transparent; border:1px solid var(--line2); border-radius:99px; padding:8px 14px; cursor:pointer; text-decoration:none; display:inline-block}
 .abtn:hover{background:var(--surf2)}
 .foot{font-size:12px; color:var(--ink3); margin-top:22px; line-height:1.6; text-align:center}
+
+.adv{margin-top:16px}
+.adv summary{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3); cursor:pointer; list-style:none}
+.adv summary::-webkit-details-marker{display:none}
+.adv summary:before{content:'+ '; color:var(--coffee)}
+.adv[open] summary:before{content:'– '}
+.adv input[type=text]{width:100%; font-family:'Hanken Grotesk',sans-serif; font-size:14px; padding:9px 11px; background:var(--surf); border:1px solid var(--line2); border-radius:var(--rs); color:var(--ink)}
+.adv input[type=text]:focus{outline:none; border-color:var(--ink)}
+
+@media print{
+  @page{ margin:12mm; }
+  body{ background:#fff; background-image:none; }
+  .wrap{ max-width:none; margin:0; padding:0; }
+  nav,.actions,.adv{ display:none !important; }
+  .card{ break-inside:avoid; border-color:#ccc; }
+  header{ margin-bottom:14px; }
+}
 </style>
+<script src="theme.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -104,6 +144,7 @@ input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; 
   <a href="kit.html">Monte seu kit</a>
   <a href="avaliador.html">Corrigir água mineral</a>
   <a href="etiquetas.html">Etiquetas</a>
+  <button id="themebtn" style="margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; color:var(--ink2); background:transparent; border:1px solid var(--line2); padding:7px 13px; border-radius:99px; cursor:pointer"></button>
 </nav>
 
 <header>
@@ -133,6 +174,19 @@ input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; 
       </div>
     </div>
   </div>
+
+  <details class="adv" id="addcafe">
+    <summary>Cadastrar um café meu</summary>
+    <div class="selrow" style="margin-top:14px">
+      <div><label for="nc-nome">Nome *</label><input type="text" id="nc-nome" placeholder="ex.: Geisha do produtor X"></div>
+      <div><label for="nc-torr">Torrefador</label><input type="text" id="nc-torr" placeholder="opcional"></div>
+      <div><label for="nc-proc">Processo</label><select id="nc-proc"></select></div>
+      <div><label for="nc-torra">Torra</label><select id="nc-torra"></select></div>
+    </div>
+    <div style="margin-top:10px"><label for="nc-notas" style="display:block; font-size:12px; color:var(--ink2); margin-bottom:5px">Notas sensoriais (separadas por vírgula)</label><input type="text" id="nc-notas" placeholder="ex.: chocolate, caramelo, cítrico"></div>
+    <div class="actions"><button class="abtn" id="nc-add">💾 Salvar café</button></div>
+    <p class="note">Fica salvo só neste navegador (localStorage). Os eixos partem do processo + torra; ajuste no passo 2 — o ajuste fica gravado no seu café.</p>
+  </details>
 </div>
 
 <div class="card">
@@ -164,6 +218,7 @@ input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; 
   <p class="note">Gotas arredondadas para inteiro (1 gota ≈ 0,062 mL da solução-mãe a 0,5 mol/L). O ppm mostrado é o real após o arredondamento.</p>
   <div class="actions">
     <a class="abtn" id="opendetail" href="#">🔧 Abrir no “Construir do zero” (receita dos frascos)</a>
+    <button class="abtn" id="sharebtn">🔗 Copiar link desta água</button>
   </div>
 </div>
 
@@ -178,30 +233,36 @@ input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; 
 
 const $=s=>document.querySelector(s);
 const fmt=(x,d=0)=>x.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 let state={ cafeId:CAFES[0].id, manual:false, eixos:{...pickEixos(CAFES[0])}, vol:500 };
 
 function pickEixos(c){ return {acidez:c.acidez, corpo:c.corpo, aroma:c.aroma, processo:c.processo}; }
 
-// --- química (mesma de data.js / index.html, recriada aqui p/ a página abrir sozinha) ---
-function hco3(p){ return p.na/M.na.mmIon*61.017 + p.k/M.k.mmIon*61.017; }
-function gh(p){ return p.mg*4.118 + p.ca*2.497; }
-function kh(p){ return hco3(p)*0.8201; }
-function tds(p){
-  const so4=p.mg/M.mg.mmIon*96.06;
-  const cl=p.ca/M.ca.mmIon*70.906;
-  return p.mg+p.ca+p.na+p.k+so4+cl+hco3(p);
+// --- química: ghPpm/khPpm/hco3FromCations/tdsOf/dropsExact/ppmFromDrops vêm de data.js ---
+function gh(p){ return ghPpm(p.mg,p.ca); }
+function kh(p){ return khPpm(hco3FromCations(p.na,p.k)); }
+function tds(p){ return tdsOf(p); }
+function dropsFor(key,ppm,vol){ return Math.round(dropsExact(ppm,M[key].mmIon,vol)); }
+function actualPpm(key,drops,vol){ return ppmFromDrops(drops,M[key].mmIon,vol); }
+
+// --- cafés do usuário (localStorage, só neste navegador) ---
+const LS_CAFES='aguacafe.cafes';
+function loadCustom(){
+  try{
+    const a=JSON.parse(localStorage.getItem(LS_CAFES)||'[]');
+    return Array.isArray(a)?a.filter(c=>c&&c.id&&c.nome&&PROCESSOS[c.processo]&&TORRAS[c.torra]):[];
+  }catch(_){ return []; }
 }
-function dropsFor(key,ppm,vol){
-  const need=ppm/M[key].mmIon*(vol/1000);
-  return Math.round(need/(STOCKM*DROPV));
-}
-function actualPpm(key,drops,vol){ return drops*STOCKM*DROPV/(vol/1000)*M[key].mmIon; }
+function saveCustom(){ try{ localStorage.setItem(LS_CAFES,JSON.stringify(MEUS)); }catch(_){} }
+let MEUS=loadCustom();
+function allCafes(){ return CAFES.concat(MEUS); }
 
 // --- selects ---
 function buildCafeSelect(){
-  const opts = CAFES.map(c=>`<option value="${c.id}">${c.nome} · ${c.torrefador}</option>`).join('');
-  $('#cafesel').innerHTML = opts + `<option value="__manual">— montar pelo processo + torra —</option>`;
+  let h = `<optgroup label="Cafés do site">`+CAFES.map(c=>`<option value="${c.id}">${esc(c.nome)} · ${esc(c.torrefador)}</option>`).join('')+`</optgroup>`;
+  if(MEUS.length) h += `<optgroup label="Meus cafés">`+MEUS.map(c=>`<option value="${esc(c.id)}">${esc(c.nome)}${c.torrefador?' · '+esc(c.torrefador):''}</option>`).join('')+`</optgroup>`;
+  $('#cafesel').innerHTML = h + `<option value="__manual">— montar pelo processo + torra —</option>`;
   $('#cafesel').value = state.manual ? '__manual' : state.cafeId;
   $('#cafesel').onchange = e=>{
     if(e.target.value==='__manual'){
@@ -209,7 +270,7 @@ function buildCafeSelect(){
       state.eixos={...baselineEixos($('#procsel').value, $('#torrasel').value), processo:$('#procsel').value};
     } else {
       state.manual=false; state.cafeId=e.target.value;
-      state.eixos=pickEixos(CAFES.find(c=>c.id===e.target.value));
+      state.eixos=pickEixos(allCafes().find(c=>c.id===e.target.value));
     }
     renderAll();
   };
@@ -218,23 +279,52 @@ function buildProcTorra(){
   $('#procsel').innerHTML = Object.entries(PROCESSOS).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');
   $('#torrasel').innerHTML = Object.entries(TORRAS).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');
   $('#procsel').value = state.eixos.processo || 'honey';
-  $('#torrasel').value = 'media';
+  $('#torrasel').value = TORRAS[state.torraManual]?state.torraManual:'media';
   const recompute=()=>{
+    state.torraManual=$('#torrasel').value;
     state.eixos={...baselineEixos($('#procsel').value, $('#torrasel').value), processo:$('#procsel').value};
     renderEixos(); renderOutputs();
   };
   $('#procsel').onchange=recompute;
   $('#torrasel').onchange=recompute;
 }
+function buildAddCafe(){
+  $('#nc-proc').innerHTML = Object.entries(PROCESSOS).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');
+  $('#nc-torra').innerHTML = Object.entries(TORRAS).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');
+  $('#nc-torra').value='media';
+  $('#nc-add').onclick=()=>{
+    const nome=$('#nc-nome').value.trim();
+    if(!nome){ $('#nc-nome').focus(); return; }
+    const proc=$('#nc-proc').value, torra=$('#nc-torra').value;
+    const c={ id:'meu-'+Date.now(), nome, torrefador:$('#nc-torr').value.trim(),
+      origem:'', variedade:'', altitude:null, pontuacao:null,
+      processo:proc, torra, ...baselineEixos(proc,torra),
+      notas:$('#nc-notas').value.split(',').map(s=>s.trim()).filter(Boolean),
+      custom:true };
+    MEUS.push(c); saveCustom();
+    state.manual=false; state.cafeId=c.id; state.eixos=pickEixos(c);
+    $('#nc-nome').value=''; $('#nc-torr').value=''; $('#nc-notas').value='';
+    $('#addcafe').removeAttribute('open');
+    renderAll();
+  };
+}
 function renderCafeInfo(){
   const manual=state.manual;
   $('#cafeinfo').style.display = manual?'none':'block';
   $('#manualinfo').style.display = manual?'block':'none';
   if(!manual){
-    const c=CAFES.find(x=>x.id===state.cafeId);
+    const c=allCafes().find(x=>x.id===state.cafeId);
     const pts = c.pontuacao?` · ${c.pontuacao} SCA`:'';
-    $('#cafemeta').innerHTML = `<b>${PROCESSOS[c.processo].n}</b> · torra ${TORRAS[c.torra].n.toLowerCase()} · ${c.variedade} · ${c.origem}${pts}`;
-    $('#cafetags').innerHTML = c.notas.map(n=>`<span class="tag">${n}</span>`).join('');
+    const extra = [c.variedade,c.origem].filter(Boolean).map(esc).join(' · ');
+    $('#cafemeta').innerHTML = `<b>${PROCESSOS[c.processo].n}</b> · torra ${TORRAS[c.torra].n.toLowerCase()}${extra?' · '+extra:''}${pts}`;
+    $('#cafetags').innerHTML = (c.notas||[]).map(n=>`<span class="tag">${esc(n)}</span>`).join('')
+      + (c.custom?`<button class="abtn" id="delcafe">✕ remover este café</button>`:'');
+    const del=$('#delcafe');
+    if(del) del.onclick=()=>{
+      MEUS=MEUS.filter(x=>x.id!==c.id); saveCustom();
+      state.cafeId=CAFES[0].id; state.eixos=pickEixos(CAFES[0]);
+      renderAll();
+    };
   }
 }
 
@@ -255,6 +345,11 @@ function renderEixos(){
   $('#eixos').querySelectorAll('.sl').forEach(s=>s.oninput=()=>{
     state.eixos[s.dataset.e]=+s.value;
     s.parentElement.querySelector('.eixoval').textContent=fmt(+s.value,1);
+    // nos cafés do usuário, o ajuste fino fica gravado no próprio café
+    if(!state.manual){
+      const c=MEUS.find(x=>x.id===state.cafeId);
+      if(c){ c.acidez=state.eixos.acidez; c.corpo=state.eixos.corpo; c.aroma=state.eixos.aroma; saveCustom(); }
+    }
     renderOutputs();
   });
 }
@@ -313,11 +408,75 @@ function renderOutputs(){
 
   // link p/ index.html com o alvo no hash
   $('#opendetail').href = `index.html#mg=${p.mg}&ca=${p.ca}&na=${p.na}&k=${p.k}&v=${state.vol}`;
+  writeHash();
 }
 
 function renderAll(){ buildCafeSelect(); renderCafeInfo(); renderEixos(); renderOutputs(); }
 
+// --- link compartilhável (#cafe=… ou #proc=…&torra=…) + último estado ---
+function writeHash(){
+  const e=state.eixos;
+  let h = state.manual
+    ? `proc=${e.processo}&torra=${$('#torrasel').value}`
+    : `cafe=${encodeURIComponent(state.cafeId)}`;
+  h += `&a=${e.acidez}&c=${e.corpo}&ar=${e.aroma}&v=${state.vol}`;
+  history.replaceState(null,'','#'+h);
+  saveLocal();
+}
+function readHash(){
+  if(!location.hash) return false;
+  const q=new URLSearchParams(location.hash.slice(1));
+  let any=false;
+  if(q.has('cafe')){
+    const c=allCafes().find(x=>x.id===q.get('cafe'));
+    if(c){ state.manual=false; state.cafeId=c.id; state.eixos=pickEixos(c); any=true; }
+  } else if(q.has('proc') && PROCESSOS[q.get('proc')]){
+    const proc=q.get('proc'), torra=TORRAS[q.get('torra')]?q.get('torra'):'media';
+    state.manual=true; state.torraManual=torra;
+    state.eixos={...baselineEixos(proc,torra), processo:proc};
+    any=true;
+  }
+  if(any){
+    [['a','acidez'],['c','corpo'],['ar','aroma']].forEach(([qk,ek])=>{
+      if(q.has(qk)){ const v=parseFloat(q.get(qk)); if(!isNaN(v)) state.eixos[ek]=Math.max(0,Math.min(10,v)); }
+    });
+  }
+  if(q.has('v')){ const v=parseInt(q.get('v'),10); if(VOLS.includes(v)) state.vol=v; }
+  return any;
+}
+function saveLocal(){
+  try{ localStorage.setItem('aguacafe.recomendador',JSON.stringify({
+    cafeId:state.cafeId, manual:state.manual, vol:state.vol,
+    proc:state.eixos.processo, torra:$('#torrasel').value })); }catch(_){}
+}
+function loadLocal(){
+  try{
+    const s=JSON.parse(localStorage.getItem('aguacafe.recomendador')||'null');
+    if(!s) return false;
+    if(VOLS.includes(s.vol)) state.vol=s.vol;
+    if(s.manual && PROCESSOS[s.proc]){
+      const torra=TORRAS[s.torra]?s.torra:'media';
+      state.manual=true; state.torraManual=torra;
+      state.eixos={...baselineEixos(s.proc,torra), processo:s.proc};
+      return true;
+    }
+    const c=allCafes().find(x=>x.id===s.cafeId);
+    if(c){ state.manual=false; state.cafeId=c.id; state.eixos=pickEixos(c); return true; }
+    return false;
+  }catch(_){ return false; }
+}
+
+$('#sharebtn').onclick=async()=>{
+  writeHash();
+  const btn=$('#sharebtn'), orig=btn.textContent;
+  try{ await navigator.clipboard.writeText(location.href); btn.textContent='✓ Link copiado'; }
+  catch(_){ btn.textContent='Copie da barra de endereço'; }
+  setTimeout(()=>btn.textContent=orig,1800);
+};
+
+if(!readHash()) loadLocal();
 buildProcTorra();
+buildAddCafe();
 buildVols();
 renderAll();
 </script>
