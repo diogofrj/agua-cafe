@@ -1,0 +1,14 @@
+{
+  "name": "Água para café — mineralização por gotas",
+  "short_name": "Água p/ café",
+  "description": "Remineralize água destilada/osmose para café especial: perfis, gotas por volume e receita das soluções-mãe.",
+  "start_url": "index.html",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#F2ECE0",
+  "theme_color": "#F2ECE0",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

@@ -13,6 +13,7 @@ Padrão para uma nova sessão/modelo retomar sem atrito:
   - Screenshot: `chrome --headless=new --screenshot=out.png "--window-size=W,H" file:///.../pagina.html`
   - Impressão (aplica `@media print`): `--print-to-pdf=out.pdf`; rasterize com `pdftoppm` (poppler, no WSL).
   - ⚠ Em telas Windows a 125%, o viewport CSS do headless sai ~1,25× a largura da janela e a captura **corta a direita** — é artefato, não overflow. Para checar overflow de verdade, meça `document.documentElement.scrollWidth === clientWidth`.
+- **Validar a química sem navegador visível**: abra `tests.html` (headless serve) e confira o resumo verde — o `document.title` carrega ✓/✗ para inspeção automatizada.
 - **Finalizar a sessão**: rode `/finalizar` (atualiza docs → valida → commit+push). Definição em `.claude/commands/finalizar.md`.
 
 ## NÃO faça
@@ -24,13 +25,15 @@ Padrão para uma nova sessão/modelo retomar sem atrito:
 - Não reintroduza diluição no avaliador (ver regras de química).
 
 ## Arquivos
-- `index.html` — construir do zero (presets + ppm livre → receita das soluções + gotas).
-- `recomendador.html` — escolher um café (ou montar por processo+torra) → alvo de água sob medida, gotas e aptidão (espresso/coado). Linka de volta ao `index.html` via `#hash`.
+- `index.html` — construir do zero (presets + ppm livre → receita das soluções + gotas). Estado no `#hash` (compartilhável); último perfil/volume lembrado em `localStorage` (`aguacafe.index`).
+- `recomendador.html` — escolher um café (ou montar por processo+torra) → alvo de água sob medida, gotas e aptidão (espresso/coado). Linka de volta ao `index.html` via `#hash`. Tem hash próprio compartilhável (`#cafe=<id>` ou `#proc=…&torra=…`, mais `a/c/ar/v`) e cafés do usuário em `localStorage` (`aguacafe.cafes`; o ajuste de eixos fica gravado no café custom).
 - `kit.html` — lista de compras (minerais, equipamentos, preços, links). Conteúdo estático.
-- `avaliador.html` — avaliar rótulo de água mineral e corrigir até o alvo (sem diluir).
+- `avaliador.html` — avaliar rótulo de água mineral e corrigir até o alvo (sem diluir). Os "exemplos" são **arquétipos ilustrativos**, não marcas — não cadastre rótulos de marcas reais sem fonte.
 - `etiquetas.html` — escolher tamanho/cópias e imprimir as etiquetas (com linhas de corte) para colar nos frascos.
-- `data.js` — fonte única de massas molares, calibração e perfis; carregado por `index.html` e `avaliador.html` **antes** do script inline.
+- `data.js` — fonte única de massas molares, calibração, perfis **e das funções de química** (`ghPpm`/`khPpm`/`hco3FromCations`/`tdsOf`/`dropsExact`/`ppmFromDrops`); carregado pelas páginas de cálculo **antes** do script inline. Não re-inline os fatores (4,118 · 2,497 · 0,8201 etc.) nos HTMLs.
 - `cafes.js` — banco de cafés (seed) + motor `café → água`; carregado por `recomendador.html` **depois** do `data.js` (usa `M`, `KEYS`).
+- `tests.html` — rede de segurança da química: abre via `file://` e confere os invariantes de `data.js` + `cafes.js` (calibração, fatores GH/KH, extremos do motor vs. presets, regras de espresso, banco de cafés). **Confira tudo verde antes de publicar** mudança em química/perfis/motor.
+- `manifest.json` + `icon.svg` — PWA mínimo (instalável no celular; sem service worker, de propósito — as fontes vêm do Google Fonts).
 - `labels.py` — gera os 4 PNGs de etiqueta (Pillow; baixa as fontes sozinho na 1ª execução).
 - `labels/` — PNGs gerados. `fonts/` — TTFs baixadas (no `.gitignore`).
 
@@ -42,12 +45,13 @@ Massas molares (g/mol) — íons: Mg 24,305 · Ca 40,078 · Na 22,990 · K 39,09
 Sais: MgSO₄·7H₂O 246,47 · CaCl₂·2H₂O 147,01 · NaHCO₃ 84,007 · KHCO₃ 100,115.
 Estes números vivem em `data.js` (fonte única dos HTMLs); o `labels.py` repete só as massas dos sais e calcula as gramas a partir delas.
 
-Fórmulas:
-- `gotas = (ppm_íon / MM_íon × volume_L) / (STOCKM × DROPV)`
+Fórmulas (implementadas uma vez em `data.js` — use as funções, não os números):
+- `gotas = (ppm_íon / MM_íon × volume_L) / (STOCKM × DROPV)` → `dropsExact()` / inversa `ppmFromDrops()`
 - `gramas no frasco = STOCKM × volume_frasco_L × MM_sal`
-- `GH (ppm CaCO₃) = mg_ppm×4,118 + ca_ppm×2,497`
-- `KH (ppm CaCO₃) = HCO₃_ppm × 0,8201`
-- `HCO₃ de um bicarbonato = cátion_ppm / MM_cátion × 61,017`
+- `GH (ppm CaCO₃) = mg_ppm×4,118 + ca_ppm×2,497` → `ghPpm()` (fatores derivados de `MM_CACO3`)
+- `KH (ppm CaCO₃) = HCO₃_ppm × 0,8201` → `khPpm()`
+- `HCO₃ de um bicarbonato = cátion_ppm / MM_cátion × 61,017` → `hco3FromCations()`
+- TDS aproximado de um alvo `{mg,ca,na,k}` (soma os contra-íons dos sais) → `tdsOf()`
 
 Quatro minerais → quatro frascos separados: Magnésio (MgSO₄·7H₂O), Cálcio (CaCl₂·2H₂O), Sódio (NaHCO₃), Potássio (KHCO₃).
 Preparo do frasco: dissolver e **completar até a marca**. NUNCA "100 − massa" (o sal ocupa volume).
@@ -59,12 +63,12 @@ Quem decide a água é o **processo + torra**, NÃO a variedade (o mesmo Mundo N
 - Sódio fica 0 (é a alavanca do espresso, não do coado). Espresso é só um **selo de aptidão** (`aptidao()`), não um segundo caminho químico — para a água de espresso, manda pro perfil Espresso do `index.html`.
 - Eixos por café são editáveis na UI (override): o processo dá o ponto de partida, o usuário corrige se o pacote surpreender.
 
-## Regras de química (regressão aqui = bug)
+## Regras de química (regressão aqui = bug — `tests.html` cobre as testáveis)
 - Magnésio e Cálcio nunca no mesmo frasco — sulfato + cálcio precipita CaSO₄.
-- Sódio e Potássio são ambos bicarbonato → somam alcalinidade; nunca conte em dobro.
+- Sódio e Potássio são ambos bicarbonato → somam alcalinidade; nunca conte em dobro. No `index.html`, usar os dois é legítimo (o preset Espresso divide) — o aviso só dispara quando o KH resultante passa de 45.
 - Espresso: o **cloreto** (do CaCl₂) corrói; o **cálcio** incrusta. Perfil de espresso = sem cálcio, corpo via sódio, buffer médio.
 - Gesso (CaSO₄) não vira solução-mãe concentrada (solubilidade ~2,4 g/L) — só dose direto em coado.
-- Avaliador: só **adiciona**, nunca remove. Se a água excede o alvo (dureza/alcalinidade) ou tem Na/Cl/TDS altos → rejeita e explica o porquê. Sem diluição.
+- Avaliador: só **adiciona**, nunca remove. Se a água excede o alvo (dureza/alcalinidade) ou tem Na/Cl/TDS altos → rejeita e explica o porquê. Sem diluição. Os limites de alerta/veto vivem no objeto `LIM` (Na 25 · Cl 30 · SO₄ 50 · TDS 400 mg/L) — alerta e veto usam o **mesmo** número.
 
 ## Tokens de design (vars CSS, manter consistente entre páginas)
 paper `#F2ECE0` · surf `#FAF6EE` · ink `#2B211A` · accent café `#7A4B22`.

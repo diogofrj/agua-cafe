@@ -15,11 +15,15 @@ O portal fica em `https://SEU_USUARIO.github.io/agua-cafe/`.
 
 ## Cinco páginas
 
-- `index.html` — construir água do zero (base destilada/osmose).
+- `index.html` — construir água do zero (base destilada/osmose). O estado vive
+  no `#hash` da URL (link compartilhável) e o último perfil/volume fica lembrado
+  no navegador.
 - `recomendador.html` — **café → água ideal**: escolha um café cadastrado (ou
   monte pelo processo + torra do pacote) e receba o perfil de água sob medida —
   quantas gotas de cada mineral, GH/KH/TDS e a aptidão de preparo (espresso/coado).
-  Quem decide a água é o **processo**, não a variedade.
+  Quem decide a água é o **processo**, não a variedade. Dá para **cadastrar os
+  seus cafés** direto na página (ficam salvos no navegador) e compartilhar a
+  água de um café por link.
 - `kit.html` — lista de minerais, equipamentos e acessórios com links de compra.
 - `avaliador.html` — avaliar uma água mineral de rótulo e corrigir até o alvo.
   Se a água já passa do alvo em dureza/alcalinidade (ou tem sódio/cloreto/TDS
@@ -28,10 +32,12 @@ O portal fica em `https://SEU_USUARIO.github.io/agua-cafe/`.
 - `etiquetas.html` — escolher, dimensionar e imprimir as etiquetas dos frascos
   (com linhas de corte) para recortar e colar em cada conta-gotas.
 
-As constantes químicas e os perfis ficam em `data.js` (fonte única), carregado
-por `index.html` e `avaliador.html`. O banco de cafés e o motor `café → água`
-ficam em `cafes.js`, carregado por `recomendador.html` (cadastrar um café = adicionar
-um objeto a `CAFES`).
+As constantes químicas, os perfis **e as fórmulas** (GH/KH/TDS/gotas) ficam em
+`data.js` (fonte única), carregado pelas páginas de cálculo. O banco de cafés e
+o motor `café → água` ficam em `cafes.js`, carregado por `recomendador.html`
+(cadastrar um café permanente = adicionar um objeto a `CAFES`; cafés pessoais
+podem ser cadastrados pela própria UI). O site tem um `manifest.json` — dá para
+instalar como app no celular.
 
 ## O que ele faz
 
@@ -77,10 +83,13 @@ as massas dos sais são calculadas a partir das mesmas constantes do portal.
 
 ## Desenvolvimento
 
-Vanilla, sem build. As constantes de química e os perfis ficam em `data.js`
-(fonte única). Para o padrão de ambiente (Python via WSL, validação com Chrome
-headless, publicação) e as regras do projeto, veja `AGENTS.md`. Para encerrar um
-trabalho de forma consistente, use o comando `/finalizar` (no Claude Code).
+Vanilla, sem build. As constantes de química, os perfis e as fórmulas ficam em
+`data.js` (fonte única). Os invariantes da química têm uma rede de segurança:
+abra `tests.html` no navegador e confira o resumo verde antes de publicar
+mudanças em `data.js`/`cafes.js`. Para o padrão de ambiente (Python via WSL,
+validação com Chrome headless, publicação) e as regras do projeto, veja
+`AGENTS.md`. Para encerrar um trabalho de forma consistente, use o comando
+`/finalizar` (no Claude Code).
 
 ## Crédito
 

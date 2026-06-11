@@ -6,6 +6,8 @@
 <title>Avaliador de água mineral · café</title>
 <meta name="description" content="Avalie uma água mineral de rótulo e veja se serve de base para café — e quantas gotas até o seu alvo. Mineral só se adiciona, nunca se remove.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 3C10 12 7 16 7 21a9 9 0 0 0 18 0c0-5-3-9-9-18z' fill='%237A4B22'/></svg>">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F2ECE0">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Avaliador & corretor de água para café">
 <meta property="og:description" content="Informe os minerais do rótulo: o portal diz se a água serve de base e calcula a correção até o alvo, sem diluir.">
@@ -78,6 +80,14 @@ h1 em{font-style:italic; color:var(--coffee)}
 .dose .mt{font-size:12px; color:var(--ink2); font-family:'JetBrains Mono',monospace; margin-left:auto; text-align:right}
 .note{font-size:12.5px; color:var(--ink2); margin-top:12px; line-height:1.55}
 .foot{font-size:12px; color:var(--ink3); margin-top:22px; text-align:center; line-height:1.6}
+@media print{
+  @page{ margin:12mm; }
+  body{ background:#fff; background-image:none; }
+  .wrap{ max-width:none; margin:0; padding:0; }
+  .nav,#examples,.exnote{ display:none !important; }
+  .card{ break-inside:avoid; border-color:#ccc; }
+  header{ margin-bottom:14px; }
+}
 </style>
 </head>
 <body>
@@ -96,9 +106,10 @@ h1 em{font-style:italic; color:var(--coffee)}
 </header>
 
 <div class="card">
-  <div class="label"><span>A água que você tem (mg/L do rótulo)</span><button class="btnlink" id="exbtn">preencher exemplo</button></div>
+  <div class="label"><span>A água que você tem (mg/L do rótulo)</span></div>
   <div class="wgrid" id="wgrid"></div>
-  <p class="note">📷 Leitura por foto do rótulo: ainda não nesta versão (a página é estática, sem servidor). Por ora, digite os valores — ou fotografe e me peça para extrair.</p>
+  <p class="note exnote" style="margin-bottom:8px">Ou parta de um exemplo ilustrativo (não são marcas — confira sempre o rótulo da sua garrafa):</p>
+  <div class="presets" id="examples"></div>
 </div>
 
 <div class="card">
@@ -141,15 +152,25 @@ const FIELDS=[
   ['k','Potássio','mg/L'],['hco3','Bicarbonato','mg/L'],['so4','Sulfato','mg/L'],
   ['cl','Cloreto','mg/L'],['tds','TDS / resíduo','mg/L'],['ph','pH','']
 ];
-const EXAMPLE={ca:4,mg:2,na:3,k:1,hco3:18,so4:2,cl:3,tds:40,ph:6.8};
+// Arquétipos de rótulo (valores ilustrativos, não são marcas reais)
+const EXEMPLOS=[
+  {n:'Quase destilada',   v:{ca:1, mg:0.5,na:1, k:0.5,hco3:4,  so4:1, cl:1, tds:10, ph:6.2}},
+  {n:'Leve de serra',     v:{ca:4, mg:2,  na:3, k:1,  hco3:18, so4:2, cl:3, tds:40, ph:6.8}},
+  {n:'Média equilibrada', v:{ca:15,mg:6,  na:10,k:2,  hco3:75, so4:8, cl:8, tds:130,ph:7.2}},
+  {n:'Alcalina pesada',   v:{ca:40,mg:15, na:60,k:4,  hco3:240,so4:20,cl:30,tds:420,ph:8.1}},
+];
+
+// Limites de alerta/veto (mg/L) — usados na avaliação E na correção
+const LIM={na:25, cl:30, so4:50, tds:400};
 
 let water={ca:0,mg:0,na:0,k:0,hco3:0,so4:0,cl:0,tds:0,ph:0};
 let target=0, alkSrc='k', vol=500;
 
 const $=s=>document.querySelector(s);
 const fmt=(x,d=0)=>x.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
-const ghF=(ca,mg)=>mg*4.118+ca*2.497;
-const khF=h=>h*0.8201;
+// ghPpm/khPpm/hco3FromCations/dropsExact vêm de data.js
+const ghF=(ca,mg)=>ghPpm(mg,ca);
+const khF=h=>khPpm(h);
 const volTxt=v=>v>=1000?(v/1000)+' L':v+' ml';
 
 function buildFields(){
@@ -168,7 +189,12 @@ function buildVols(){
 $('#alksrc')&&$('#alksrc').querySelectorAll('button').forEach(b=>b.onclick=()=>{
   alkSrc=b.dataset.s; $('#alksrc').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); render();
 });
-$('#exbtn').onclick=()=>{water={...EXAMPLE}; buildFields(); render();};
+function buildExamples(){
+  $('#examples').innerHTML=EXEMPLOS.map((e,i)=>`<button class="preset" data-i="${i}">${e.n}</button>`).join('');
+  $('#examples').querySelectorAll('.preset').forEach(b=>b.onclick=()=>{
+    water={...EXEMPLOS[+b.dataset.i].v}; buildFields(); render();
+  });
+}
 
 function evaluate(){
   const gh=ghF(water.ca,water.mg), kh=khF(water.hco3);
@@ -180,30 +206,29 @@ function evaluate(){
   let cls='mid', verdict='Utilizável com ajuste';
   if(empty){cls='good'; verdict='Base excelente — quase zerada, construa à vontade'; f.push(['ok','Pouquíssimo mineral: funciona como destilada para montar qualquer perfil.']);}
   else{
-    if(gh>150||kh>80||(water.tds>400)){cls='bad'; verdict='Difícil para café';}
-    else if(gh>=40&&gh<=120&&kh>=15&&kh<=50&&water.na<25){cls='good'; verdict='Boa — utilizável com pequenos ajustes';}
+    if(gh>150||kh>80||(water.tds>LIM.tds)){cls='bad'; verdict='Difícil para café';}
+    else if(gh>=40&&gh<=120&&kh>=15&&kh<=50&&water.na<LIM.na){cls='good'; verdict='Boa — utilizável com pequenos ajustes';}
     if(gh<40)f.push(['ok','Dureza baixa: dá pra subir Mg/Ca livremente.']);
     else if(gh>120)f.push(['warn','Dureza alta ('+fmt(gh)+'): corpo pesado e risco de incrustação no espresso. Só diluindo pra baixar.']);
     else f.push(['','Dureza média ('+fmt(gh)+').']);
     if(kh>50)f.push(['warn','Alcalinidade alta ('+fmt(kh)+'): abafa a acidez. Não dá pra reduzir adicionando — só diluir.']);
     else if(kh<15)f.push(['ok','Alcalinidade baixa: acidez fica expressiva, e dá pra completar o buffer.']);
-    if(water.na>25)f.push(['warn','Sódio alto ('+fmt(water.na)+' mg/L): tende a achatar a xícara.']);
-    if(water.cl>25)f.push(['warn','Cloreto alto ('+fmt(water.cl)+' mg/L): risco de corrosão e sabor metálico.']);
-    if(water.so4>50)f.push(['','Sulfato elevado ('+fmt(water.so4)+' mg/L): tende a secar e realçar amargor.']);
-    if(water.tds>400)f.push(['warn','TDS alto ('+fmt(water.tds)+'): mineralizada demais.']);
+    if(water.na>LIM.na)f.push(['warn','Sódio alto ('+fmt(water.na)+' mg/L): tende a achatar a xícara.']);
+    if(water.cl>LIM.cl)f.push(['warn','Cloreto alto ('+fmt(water.cl)+' mg/L): risco de corrosão e sabor metálico.']);
+    if(water.so4>LIM.so4)f.push(['','Sulfato elevado ('+fmt(water.so4)+' mg/L): tende a secar e realçar amargor.']);
+    if(water.tds>LIM.tds)f.push(['warn','TDS alto ('+fmt(water.tds)+'): mineralizada demais.']);
   }
   $('#verdict').innerHTML=`<span class="tag ${cls}">${verdict}</span>`;
   $('#flags').innerHTML=f.map(([c,t])=>`<li class="${c}">${t}</li>`).join('');
 }
 
 function dropsFor(ionMM, deficit){
-  const need=deficit/ionMM*(vol/1000);
-  return Math.round(need/(STOCKM*DROPV));
+  return Math.round(dropsExact(deficit,ionMM,vol));
 }
 function render(){
   evaluate();
   const p=AVAL_PRESETS[target].v;
-  const tMg=p.mg, tCa=p.ca, tHco3=(p.k/ION.k + p.na/ION.na)*ION.hco3;
+  const tMg=p.mg, tCa=p.ca, tHco3=hco3FromCations(p.na,p.k);
   const gh=ghF(water.ca,water.mg), kh=khF(water.hco3);
 
   // razões para NÃO recomendar adicionar (sem diluição)
@@ -212,9 +237,9 @@ function render(){
   if(tCa>0.01 && water.ca>tCa+0.5) reasons.push(`Cálcio já está em ${fmt(water.ca)} ppm, acima do alvo (${fmt(tCa)}). Não dá pra reduzir adicionando.`);
   if(water.hco3>tHco3+1) reasons.push(`Alcalinidade já está em ${fmt(water.hco3)} mg/L de bicarbonato, acima do alvo (${fmt(tHco3)}). Buffer alto abafa a acidez e não some com adição.`);
   if(tCa<=0.01 && water.ca>0.5) reasons.push(`Este perfil pede cálcio zero, mas a água tem ${fmt(water.ca)} ppm — só dá com água destilada.`);
-  if(water.na>25) reasons.push(`Sódio alto (${fmt(water.na)} mg/L): achata a xícara, e mineralizar não corrige.`);
-  if(water.cl>30) reasons.push(`Cloreto alto (${fmt(water.cl)} mg/L): risco de corrosão e sabor; adicionar piora.`);
-  if(water.tds>400) reasons.push(`TDS alto (${fmt(water.tds)} mg/L): água já muito mineralizada para construir em cima.`);
+  if(water.na>LIM.na) reasons.push(`Sódio alto (${fmt(water.na)} mg/L): achata a xícara, e mineralizar não corrige.`);
+  if(water.cl>LIM.cl) reasons.push(`Cloreto alto (${fmt(water.cl)} mg/L): risco de corrosão e sabor; adicionar piora.`);
+  if(water.tds>LIM.tds) reasons.push(`TDS alto (${fmt(water.tds)} mg/L): água já muito mineralizada para construir em cima.`);
 
   if(reasons.length){
     $('#correction').innerHTML=`<div class="impossible"><b>Não recomendado adicionar minerais a esta água.</b><ul style="margin:8px 0 0 18px; padding:0">`
@@ -263,11 +288,11 @@ function render(){
      <div class="stat"><div class="k">Alcalinidade KH</div><div class="v num">${fmt(khr)}</div><div class="u">ppm CaCO₃</div></div>
      <div class="stat"><div class="k">TDS aprox.</div><div class="v num">${fmt(tdsF)}</div><div class="u">mg/L</div></div>`;
   let rn=`Cálcio ${fmt(caF)} · Magnésio ${fmt(mgF)} · Sódio ${fmt(naF)} · Cloreto ${fmt(clF)} mg/L.`;
-  if(clF>30)rn+=' ⚠ Cloreto acima de 30 mg/L — atenção à corrosão no espresso.';
+  if(clF>LIM.cl)rn+=` ⚠ Cloreto acima de ${LIM.cl} mg/L — atenção à corrosão no espresso.`;
   $('#resnote').textContent=rn;
 }
 
-buildFields(); buildPresets(); buildVols(); render();
+buildFields(); buildExamples(); buildPresets(); buildVols(); render();
 </script>
 </body>
 </html>
