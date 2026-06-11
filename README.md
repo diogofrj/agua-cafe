@@ -22,8 +22,12 @@ O portal fica em `https://SEU_USUARIO.github.io/agua-cafe/`.
   monte pelo processo + torra do pacote) e receba o perfil de água sob medida —
   quantas gotas de cada mineral, GH/KH/TDS e a aptidão de preparo (espresso/coado).
   Quem decide a água é o **processo**, não a variedade. Dá para **cadastrar os
-  seus cafés** direto na página (ficam salvos no navegador) e compartilhar a
-  água de um café por link.
+  seus cafés** direto na página (ficam salvos no navegador), compartilhar a
+  água de um café por link, **exportar/importar backup em JSON** e fazer
+  **merge a partir de uma planilha pública do Google** (Arquivo → Compartilhar →
+  Publicar na web → CSV): cadastre na planilha quando quiser e importe — linhas
+  novas entram, existentes atualizam, e os ajustes finos feitos na página são
+  preservados quando a planilha não traz os eixos.
 - `kit.html` — lista de minerais, equipamentos e acessórios com links de compra.
 - `avaliador.html` — avaliar uma água mineral de rótulo e corrigir até o alvo.
   Se a água já passa do alvo em dureza/alcalinidade (ou tem sódio/cloreto/TDS

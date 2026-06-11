@@ -187,6 +187,22 @@ html[data-theme=dark] .warn{background:#3A2D17; border-color:#7A5E2B; color:#EAC
     <div class="actions"><button class="abtn" id="nc-add">💾 Salvar café</button></div>
     <p class="note">Fica salvo só neste navegador (localStorage). Os eixos partem do processo + torra; ajuste no passo 2 — o ajuste fica gravado no seu café.</p>
   </details>
+
+  <details class="adv" id="backup">
+    <summary>Backup & planilha (meus cafés)</summary>
+    <div class="actions" style="margin-top:12px">
+      <button class="abtn" id="exportbtn">⬇ Exportar JSON</button>
+      <button class="abtn" id="importbtn">⬆ Importar JSON</button>
+      <input type="file" id="importfile" accept=".json,application/json" style="display:none">
+    </div>
+    <div style="margin-top:14px">
+      <label for="sheeturl" style="display:block; font-size:12px; color:var(--ink2); margin-bottom:5px">Planilha pública do Google (link "Publicar na web" → CSV)</label>
+      <input type="text" id="sheeturl" placeholder="https://docs.google.com/spreadsheets/d/e/…/pub?output=csv">
+      <div class="actions"><button class="abtn" id="sheetbtn">🔄 Importar / merge da planilha</button></div>
+    </div>
+    <p class="note">Na planilha: <b>Arquivo → Compartilhar → Publicar na web</b>, escolha a aba e o formato <b>CSV</b>, e cole o link aqui (fica lembrado). Colunas: <b>nome</b> e <b>processo</b> (obrigatórias) · torrefador · torra · acidez · corpo · aroma · notas (separe por <b>;</b>) · origem · variedade. O merge é por nome+torrefador: linha nova cadastra, linha existente atualiza — e se a planilha não tiver eixos, os seus ajustes finos são preservados. A importação JSON também faz merge (por id).</p>
+    <p class="note" id="syncstatus" style="font-weight:600"></p>
+  </details>
 </div>
 
 <div class="card">
@@ -473,6 +489,124 @@ $('#sharebtn').onclick=async()=>{
   catch(_){ btn.textContent='Copie da barra de endereço'; }
   setTimeout(()=>btn.textContent=orig,1800);
 };
+
+/* --- backup (JSON) e merge com planilha pública do Google (CSV publicado).
+       O id de uma linha da planilha é derivado de nome+torrefador: reimportar
+       atualiza em vez de duplicar. Sem colunas de eixos, o merge preserva o
+       ajuste fino feito na UI. --- */
+const LS_SHEET='aguacafe.sheet';
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+const slug=s=>norm(s).replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+
+function resolveProc(v){
+  const n=norm(v);
+  if(!n) return null;
+  if(PROCESSOS[n]) return n;
+  for(const [k,p] of Object.entries(PROCESSOS)) if(norm(p.n)===n) return k;
+  const keys=Object.keys(PROCESSOS).sort((a,b)=>b.length-a.length);
+  for(const k of keys) if(n.includes(k)||norm(PROCESSOS[k].n).includes(n)) return k;
+  return null;
+}
+function resolveTorra(v){
+  const n=norm(v);
+  if(TORRAS[n]) return n;
+  for(const [k,t] of Object.entries(TORRAS)) if(norm(t.n)===n) return k;
+  return null;
+}
+const num10=v=>{ const x=parseFloat(String(v??'').replace(',','.')); return isNaN(x)?null:Math.max(0,Math.min(10,x)); };
+
+function sanitizeCafe(o){
+  if(!o||typeof o!=='object') return null;
+  const nome=String(o.nome||'').trim();
+  const proc=resolveProc(o.processo);
+  if(!nome||!proc) return null;
+  const torra=resolveTorra(o.torra)||'media';
+  const base=baselineEixos(proc,torra);
+  const a=num10(o.acidez), c=num10(o.corpo), ar=num10(o.aroma);
+  return {
+    id:String(o.id||('sheet-'+slug(nome+'-'+(o.torrefador||'')))),
+    nome, torrefador:String(o.torrefador||'').trim(),
+    origem:String(o.origem||'').trim(), variedade:String(o.variedade||'').trim(),
+    altitude:null, pontuacao:null, processo:proc, torra,
+    acidez:a??base.acidez, corpo:c??base.corpo, aroma:ar??base.aroma,
+    notas:Array.isArray(o.notas)?o.notas.map(s=>String(s).trim()).filter(Boolean)
+         :String(o.notas||'').split(/[;|]/).map(s=>s.trim()).filter(Boolean),
+    custom:true,
+    keepEixos:(a==null&&c==null&&ar==null),   // sem eixos na fonte → preserva ajuste local no merge
+  };
+}
+function mergeCafes(list){
+  let added=0,updated=0,skipped=0;
+  list.forEach(item=>{
+    if(!item){skipped++; return;}
+    const i=MEUS.findIndex(x=>x.id===item.id);
+    if(i>=0){
+      if(item.keepEixos){ item.acidez=MEUS[i].acidez; item.corpo=MEUS[i].corpo; item.aroma=MEUS[i].aroma; }
+      delete item.keepEixos; MEUS[i]=item; updated++;
+    } else { delete item.keepEixos; MEUS.push(item); added++; }
+  });
+  saveCustom();
+  return {added,updated,skipped};
+}
+function syncMsg(r,fonte){
+  $('#syncstatus').textContent=`✓ ${fonte}: ${r.added} cadastrado(s), ${r.updated} atualizado(s)`
+    +(r.skipped?`, ${r.skipped} linha(s) ignorada(s) — confira nome e processo`:'')+'.';
+}
+function parseCsv(text){
+  const rows=[]; let row=[], cell='', q=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(q){ if(ch==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=ch; }
+    else if(ch==='"') q=true;
+    else if(ch===','){ row.push(cell); cell=''; }
+    else if(ch==='\n'||ch==='\r'){ if(ch==='\r'&&text[i+1]==='\n')i++; row.push(cell); rows.push(row); row=[]; cell=''; }
+    else cell+=ch;
+  }
+  if(cell!==''||row.length){ row.push(cell); rows.push(row); }
+  return rows.filter(r=>r.some(x=>x.trim()!==''));
+}
+
+$('#exportbtn').onclick=()=>{
+  const data=JSON.stringify({app:'aguacafe',versao:1,exportadoEm:new Date().toISOString(),cafes:MEUS},null,2);
+  try{
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));
+    a.download='aguacafe-meus-cafes.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    $('#syncstatus').textContent=`✓ Exportados ${MEUS.length} café(s).`;
+  }catch(_){ $('#syncstatus').textContent='Não deu para gerar o arquivo neste navegador.'; }
+};
+$('#importbtn').onclick=()=>$('#importfile').click();
+$('#importfile').onchange=async e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f) return;
+  try{
+    const j=JSON.parse(await f.text());
+    const arr=Array.isArray(j)?j:(Array.isArray(j.cafes)?j.cafes:null);
+    if(!arr) throw new Error('formato');
+    const r=mergeCafes(arr.map(sanitizeCafe));
+    renderAll(); syncMsg(r,'JSON');
+  }catch(_){ $('#syncstatus').textContent='Arquivo inválido — exporte pelo botão acima para ver o formato esperado.'; }
+  e.target.value='';
+};
+$('#sheetbtn').onclick=async()=>{
+  const url=$('#sheeturl').value.trim();
+  if(!url){ $('#syncstatus').textContent='Cole o link "Publicar na web" (CSV) da planilha.'; return; }
+  try{ localStorage.setItem(LS_SHEET,url); }catch(_){}
+  $('#syncstatus').textContent='Baixando a planilha…';
+  try{
+    const res=await fetch(url,{cache:'no-store'});
+    if(!res.ok) throw new Error('http '+res.status);
+    const rows=parseCsv(await res.text());
+    if(rows.length<2) throw new Error('vazia');
+    const head=rows[0].map(norm);
+    const objs=rows.slice(1).map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]??''])));
+    const r=mergeCafes(objs.map(sanitizeCafe));
+    renderAll(); syncMsg(r,'planilha');
+  }catch(err){
+    $('#syncstatus').textContent='Não deu para importar — confira se o link é o de "Publicar na web" em formato CSV. (Abra o site via http(s); via file:// o navegador bloqueia o download.)';
+  }
+};
+try{ const u=localStorage.getItem(LS_SHEET); if(u) $('#sheeturl').value=u; }catch(_){}
 
 if(!readHash()) loadLocal();
 buildProcTorra();
