@@ -45,6 +45,32 @@ instalar como app no celular — e **tema claro/escuro**: segue o sistema por
 padrão, com botão na navegação para fixar claro ou escuro (a escolha fica
 salva no navegador).
 
+## Planilha do Google (modelo)
+
+Para cadastrar cafés direto de uma planilha sua: crie uma aba com este
+cabeçalho (só `nome` e `processo` são obrigatórias — copie a tabela abaixo e
+cole no Sheets, que as células se separam sozinhas):
+
+| nome | torrefador | processo | torra | acidez | corpo | aroma | notas | origem | variedade |
+|------|------------|----------|-------|--------|-------|-------|-------|--------|-----------|
+| Crazy Koji | Do Coado ao Espresso | koji | média | 8,5 | 5 | 10 | floral; hibisco; framboesa | Alta Mogiana/MG | Pau Brasil |
+| Mr. Chocolate | Moka Clube | natural | média | 2 | 9 | 5 | chocolate; cremoso | Brasil · blend | Blend |
+| Catuaí da feira | | lavado | | | | | | | |
+
+Regras:
+
+- **processo** aceita a chave (`lavado`, `koji`, `carbonica`…) ou o nome por
+  extenso com acento ("Maceração carbônica"). **torra**: clara / média / escura
+  (vazio = média).
+- **acidez/corpo/aroma** (0–10, vírgula decimal ok) são opcionais: vazios, o
+  café herda o DNA do processo+torra — e reimportar **preserva** o ajuste fino
+  que você fez na página. Preenchidos, a planilha manda.
+- **notas** separadas por `;` (a vírgula é separador do CSV).
+- Publique com **Arquivo → Compartilhar → Publicar na web → (aba) → CSV** e
+  cole o link na seção "Backup & planilha" do recomendador. Reimportar faz
+  merge: linha nova cadastra, existente atualiza (id = nome+torrefador), nada
+  duplica. ⚠ O link publicado é legível por quem o tiver.
+
 ## O que ele faz
 
 - Perfis prontos (doçura & acidez, equilibrado, brilhante, encorpado, espresso sem cálcio).
