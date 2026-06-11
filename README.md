@@ -37,7 +37,9 @@ As constantes químicas, os perfis **e as fórmulas** (GH/KH/TDS/gotas) ficam em
 o motor `café → água` ficam em `cafes.js`, carregado por `recomendador.html`
 (cadastrar um café permanente = adicionar um objeto a `CAFES`; cafés pessoais
 podem ser cadastrados pela própria UI). O site tem um `manifest.json` — dá para
-instalar como app no celular.
+instalar como app no celular — e **tema claro/escuro**: segue o sistema por
+padrão, com botão na navegação para fixar claro ou escuro (a escolha fica
+salva no navegador).
 
 ## O que ele faz
 

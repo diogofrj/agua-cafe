@@ -23,14 +23,25 @@
   --line:rgba(43,33,26,.13); --line2:rgba(43,33,26,.28);
   --mg:#1E6F8E; --ca:#3F7D43; --na:#C07A2B; --k:#B0463A;
   --coffee:#7A4B22;
+  --dots:rgba(43,33,26,.035);
   --r:12px; --rs:8px;
+  color-scheme:light;
+}
+html[data-theme=dark]{
+  --paper:#1B1511; --surf:#241D17; --surf2:#312822;
+  --ink:#EDE4D6; --ink2:#B3A492; --ink3:#857665;
+  --line:rgba(237,228,214,.13); --line2:rgba(237,228,214,.3);
+  --mg:#3E9DC2; --ca:#69AC6F; --na:#D69A52; --k:#CE7164;
+  --coffee:#C98F55;
+  --dots:rgba(237,228,214,.04);
+  color-scheme:dark;
 }
 *{box-sizing:border-box; margin:0; padding:0}
 body{
   background:var(--paper); color:var(--ink);
   font-family:'Hanken Grotesk',sans-serif; font-size:16px; line-height:1.6;
   -webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(rgba(43,33,26,.035) 1px,transparent 1px);
+  background-image:radial-gradient(var(--dots) 1px,transparent 1px);
   background-size:22px 22px;
 }
 .wrap{max-width:860px; margin:0 auto; padding:28px 18px 64px}
@@ -79,6 +90,8 @@ input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; 
 .badge.espresso{background:#F0E6D2; border-color:#D9B97E; color:#6B4A18}
 .badge.coado{background:#E4ECE0; border-color:#A7C49C; color:#3a5a32}
 .badge.versatil{background:var(--surf2); color:var(--ink2)}
+html[data-theme=dark] .badge.espresso{background:#3A2D17; border-color:#8A6C33; color:#EAC988}
+html[data-theme=dark] .badge.coado{background:#22301F; border-color:#4E6B45; color:#A9C99C}
 
 .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
 .stat{background:var(--surf2); border-radius:var(--rs); padding:13px 14px; min-width:0}
@@ -97,6 +110,7 @@ input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; 
 .warn{background:#F6E9D6; border:1px solid #E0C597; border-radius:var(--rs); padding:11px 14px; font-size:13px; color:#6B4A18; margin-top:14px; display:none}
 .warn.show{display:block}
 .warn b{font-weight:600}
+html[data-theme=dark] .warn{background:#3A2D17; border-color:#7A5E2B; color:#EAC988}
 
 .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px}
 .abtn{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.04em; color:var(--ink2); background:transparent; border:1px solid var(--line2); border-radius:99px; padding:8px 14px; cursor:pointer; text-decoration:none; display:inline-block}
@@ -120,6 +134,7 @@ input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; 
   header{ margin-bottom:14px; }
 }
 </style>
+<script src="theme.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -129,6 +144,7 @@ input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; 
   <a href="kit.html">Monte seu kit</a>
   <a href="avaliador.html">Corrigir água mineral</a>
   <a href="etiquetas.html">Etiquetas</a>
+  <button id="themebtn" style="margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; color:var(--ink2); background:transparent; border:1px solid var(--line2); padding:7px 13px; border-radius:99px; cursor:pointer"></button>
 </nav>
 
 <header>

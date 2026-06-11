@@ -7,7 +7,11 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 3C10 12 7 16 7 21a9 9 0 0 0 18 0c0-5-3-9-9-18z' fill='%237A4B22'/></svg>">
 <style>
 :root{--paper:#F2ECE0; --surf:#FAF6EE; --ink:#2B211A; --ink2:#6E6053; --line:rgba(43,33,26,.13);
-  --good:#3F7D43; --bad:#B0463A; --coffee:#7A4B22}
+  --good:#3F7D43; --bad:#B0463A; --coffee:#7A4B22; color-scheme:light}
+html[data-theme=dark]{--paper:#1B1511; --surf:#241D17; --ink:#EDE4D6; --ink2:#B3A492;
+  --line:rgba(237,228,214,.13); --good:#69AC6F; --bad:#CE7164; --coffee:#C98F55; color-scheme:dark}
+html[data-theme=dark] #summary.ok{background:#1F3320; color:#9FCB9A}
+html[data-theme=dark] #summary.fail{background:#3B1F1A; color:#E5A294}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--paper); color:var(--ink); font-family:'Hanken Grotesk',system-ui,sans-serif; font-size:15px; line-height:1.6}
 .wrap{max-width:760px; margin:0 auto; padding:28px 18px 64px}
@@ -22,6 +26,7 @@ h1{font-size:24px; font-weight:600; margin-bottom:4px}
 .t.fail{color:var(--bad)}
 .t .got{color:var(--ink2)}
 </style>
+<script src="theme.js"></script>
 </head>
 <body>
 <div class="wrap">

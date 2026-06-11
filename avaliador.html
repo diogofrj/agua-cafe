@@ -22,11 +22,22 @@
   --line:rgba(43,33,26,.13); --line2:rgba(43,33,26,.28);
   --mg:#1E6F8E; --ca:#3F7D43; --na:#C07A2B; --k:#B0463A;
   --coffee:#7A4B22; --good:#3F7D43; --bad:#B0463A;
+  --dots:rgba(43,33,26,.035);
   --r:12px; --rs:8px;
+  color-scheme:light;
+}
+html[data-theme=dark]{
+  --paper:#1B1511; --surf:#241D17; --surf2:#312822;
+  --ink:#EDE4D6; --ink2:#B3A492; --ink3:#857665;
+  --line:rgba(237,228,214,.13); --line2:rgba(237,228,214,.3);
+  --mg:#3E9DC2; --ca:#69AC6F; --na:#D69A52; --k:#CE7164;
+  --coffee:#C98F55; --good:#69AC6F; --bad:#CE7164;
+  --dots:rgba(237,228,214,.04);
+  color-scheme:dark;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--paper); color:var(--ink); font-family:'Hanken Grotesk',sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(rgba(43,33,26,.035) 1px,transparent 1px); background-size:22px 22px}
+  background-image:radial-gradient(var(--dots) 1px,transparent 1px); background-size:22px 22px}
 .wrap{max-width:860px; margin:0 auto; padding:22px 18px 64px}
 .num{font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums}
 .nav{display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap}
@@ -64,6 +75,9 @@ h1 em{font-style:italic; color:var(--coffee)}
 .stat .u{font-size:10.5px; color:var(--ink3); font-family:'JetBrains Mono',monospace}
 .tag{display:inline-block; font-size:13px; font-weight:500; padding:5px 13px; border-radius:99px; margin-bottom:10px}
 .tag.good{background:#E1F0DF; color:#2C5A2F} .tag.mid{background:#F6E9D6; color:#6B4A18} .tag.bad{background:#F3DAD5; color:#7E2A1E}
+html[data-theme=dark] .tag.good{background:#1F3320; color:#9FCB9A}
+html[data-theme=dark] .tag.mid{background:#3A2D17; color:#EAC988}
+html[data-theme=dark] .tag.bad{background:#3B1F1A; color:#E5A294}
 .flags{list-style:none; font-size:14px}
 .flags li{padding:6px 0 6px 20px; position:relative; border-top:1px dashed var(--line)}
 .flags li:before{content:'·'; position:absolute; left:6px; font-weight:700}
@@ -71,6 +85,8 @@ h1 em{font-style:italic; color:var(--coffee)}
 .blend{background:#EAF1F4; border:1px solid #B9D4DE; border-radius:var(--rs); padding:13px 15px; font-size:14px; margin-bottom:12px}
 .blend b{font-weight:600}
 .impossible{background:#F3DAD5; border:1px solid #DDA89D; border-radius:var(--rs); padding:13px 15px; font-size:14px; margin-bottom:12px; color:#6E2417}
+html[data-theme=dark] .blend{background:#1D2B33; border-color:#3A5868}
+html[data-theme=dark] .impossible{background:#3B1F1A; border-color:#7E4A3E; color:#E8B0A3}
 .dose{display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px dashed var(--line)}
 .dose:first-child{border-top:none}
 .dot{width:10px;height:10px;border-radius:50%;flex:none}
@@ -89,6 +105,7 @@ h1 em{font-style:italic; color:var(--coffee)}
   header{ margin-bottom:14px; }
 }
 </style>
+<script src="theme.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -98,6 +115,7 @@ h1 em{font-style:italic; color:var(--coffee)}
   <a href="kit.html">Monte seu kit</a>
   <a href="avaliador.html" class="on">Corrigir água mineral</a>
   <a href="etiquetas.html">Etiquetas</a>
+  <button id="themebtn" style="margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; color:var(--ink2); background:transparent; border:1px solid var(--line2); padding:7px 13px; border-radius:99px; cursor:pointer"></button>
 </nav>
 <header>
   <div class="kicker">Rótulo de supermercado → café</div>

@@ -33,6 +33,7 @@ Padrão para uma nova sessão/modelo retomar sem atrito:
 - `data.js` — fonte única de massas molares, calibração, perfis **e das funções de química** (`ghPpm`/`khPpm`/`hco3FromCations`/`tdsOf`/`dropsExact`/`ppmFromDrops`); carregado pelas páginas de cálculo **antes** do script inline. Não re-inline os fatores (4,118 · 2,497 · 0,8201 etc.) nos HTMLs.
 - `cafes.js` — banco de cafés (seed) + motor `café → água`; carregado por `recomendador.html` **depois** do `data.js` (usa `M`, `KEYS`).
 - `tests.html` — rede de segurança da química: abre via `file://` e confere os invariantes de `data.js` + `cafes.js` (calibração, fatores GH/KH, extremos do motor vs. presets, regras de espresso, banco de cafés). **Confira tudo verde antes de publicar** mudança em química/perfis/motor.
+- `theme.js` — tema claro/escuro/auto, compartilhado (carregado no `<head>` de toda página, depois do `<style>`). Modo salvo em `localStorage` (`aguacafe.theme`); botão = elemento `#themebtn` na nav. O CSS continua por página (regra do CSS não muda): cada `<style>` traz o bloco `html[data-theme=dark]{…}` com as overrides das vars.
 - `manifest.json` + `icon.svg` — PWA mínimo (instalável no celular; sem service worker, de propósito — as fontes vêm do Google Fonts).
 - `labels.py` — gera os 4 PNGs de etiqueta (Pillow; baixa as fontes sozinho na 1ª execução).
 - `labels/` — PNGs gerados. `fonts/` — TTFs baixadas (no `.gitignore`).
@@ -71,8 +72,9 @@ Quem decide a água é o **processo + torra**, NÃO a variedade (o mesmo Mundo N
 - Avaliador: só **adiciona**, nunca remove. Se a água excede o alvo (dureza/alcalinidade) ou tem Na/Cl/TDS altos → rejeita e explica o porquê. Sem diluição. Os limites de alerta/veto vivem no objeto `LIM` (Na 25 · Cl 30 · SO₄ 50 · TDS 400 mg/L) — alerta e veto usam o **mesmo** número.
 
 ## Tokens de design (vars CSS, manter consistente entre páginas)
-paper `#F2ECE0` · surf `#FAF6EE` · ink `#2B211A` · accent café `#7A4B22`.
-Cores dos minerais: Mg `#1E6F8E` · Ca `#3F7D43` · Na `#C07A2B` · K `#B0463A`.
+Claro (`:root`): paper `#F2ECE0` · surf `#FAF6EE` · ink `#2B211A` · accent café `#7A4B22`; minerais Mg `#1E6F8E` · Ca `#3F7D43` · Na `#C07A2B` · K `#B0463A`.
+Escuro (`html[data-theme=dark]`): paper `#1B1511` · surf `#241D17` · ink `#EDE4D6` · café `#C98F55`; minerais Mg `#3E9DC2` · Ca `#69AC6F` · Na `#D69A52` · K `#CE7164`.
+Regras do tema: o claro é o padrão do `:root`; o escuro é só override de vars (+ `color-scheme`). Componente novo com cor **hardcoded** (avisos, tags, selos) precisa de override `html[data-theme=dark] .classe{…}` — prefira usar as vars. A impressão é sempre clara (o `theme.js` força no `beforeprint`).
 Fontes: Fraunces (display), Hanken Grotesk (corpo), JetBrains Mono (números, via Google Fonts `@import`).
 Todo texto da UI em **pt-BR**; números no formato pt-BR (vírgula decimal, `toLocaleString('pt-BR')`).
 
