@@ -10,13 +10,26 @@
 
 // DNA de cada processo (acidez / corpo / aroma numa escala 0–10).
 // É o ponto de partida quando você monta um café manualmente.
+// Chaves antigas (lavado/honey/natural/fermentado/barrica) não mudam de nome:
+// cafés salvos no localStorage referenciam essas chaves.
 const PROCESSOS = {
-  lavado:     {n:'Lavado',                              acidez:7, corpo:4, aroma:3},
-  honey:      {n:'Honey / Cereja descascada',          acidez:5, corpo:6, aroma:4},
-  natural:    {n:'Natural',                             acidez:4, corpo:7, aroma:5},
-  fermentado: {n:'Fermentado (anaeróbico / koji / carbônica)', acidez:8, corpo:5, aroma:9},
-  barrica:    {n:'Envelhecido em barrica (barrel-aged)', acidez:3, corpo:8, aroma:8},
+  lavado:       {n:'Lavado',                                    acidez:7,   corpo:4,   aroma:3},
+  cereja:       {n:'Cereja descascada (pulped natural)',        acidez:6,   corpo:5,   aroma:3},
+  honey:        {n:'Honey (amarelo / vermelho / preto)',        acidez:5,   corpo:6,   aroma:4},
+  natural:      {n:'Natural',                                   acidez:4,   corpo:7,   aroma:5},
+  dupla:        {n:'Dupla fermentação / duplo lavado',          acidez:8,   corpo:4,   aroma:5},
+  anaerobico:   {n:'Fermentado anaeróbico',                     acidez:8,   corpo:5,   aroma:8},
+  carbonica:    {n:'Maceração carbônica',                       acidez:8.5, corpo:4.5, aroma:9},
+  lactica:      {n:'Fermentação láctica',                       acidez:7.5, corpo:6,   aroma:8},
+  koji:         {n:'Koji / leveduras inoculadas',               acidez:7,   corpo:6,   aroma:9.5},
+  fermentado:   {n:'Fermentado (outro / não especificado)',     acidez:8,   corpo:5,   aroma:9},
+  barrica:      {n:'Envelhecido em barrica (barrel-aged)',      acidez:3,   corpo:8,   aroma:8},
+  descafeinado: {n:'Descafeinado (Swiss Water / EA)',           acidez:4,   corpo:6,   aroma:3},
 };
+
+// Fermentações intensas: ácidas/aromáticas demais para render bem no espresso
+// (ver aptidao). O 'dupla' fica de fora: é fermentação de limpeza, não de fruta.
+const FERMENTADOS = ['fermentado','anaerobico','carbonica','lactica','koji'];
 
 // A torra empurra o DNA (somado aos eixos, depois recortado em 0–10).
 const TORRAS = {
@@ -60,7 +73,7 @@ function alvoPpm({acidez, corpo, aroma}){
 function aptidao({acidez, corpo, aroma, processo}){
   let score = corpo - acidez;
   if(processo === 'natural' || processo === 'barrica') score += 1;   // doces/chocolatados
-  if(processo === 'fermentado') score -= 2;                          // ácido/aromático
+  if(FERMENTADOS.includes(processo)) score -= 2;                     // ácido/aromático
   if(score >= 3){
     return {nivel:'espresso', rotulo:'⭐ Ótimo para espresso',
             metodo:'Espresso, Moka ou prensa francesa — também vai bem no coado.'};

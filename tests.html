@@ -106,6 +106,9 @@ grp('Processos, torras e banco de cafés');
   const choc=CAFES.find(c=>c.id==='mr-chocolate'), koji=CAFES.find(c=>c.id==='crazy-koji');
   t('Encorpado de baixa acidez (Mr. Chocolate) → selo espresso', choc && aptidao(choc).nivel==='espresso', choc&&aptidao(choc).nivel);
   t('Fermentado ácido/aromático (Crazy Koji) → melhor coado', koji && aptidao(koji).nivel==='coado', koji&&aptidao(koji).nivel);
+  t('Toda a família FERMENTADOS existe em PROCESSOS', FERMENTADOS.every(p=>!!PROCESSOS[p]), FERMENTADOS.join(', '));
+  t('Família fermentada → melhor coado (penalidade de espresso)', FERMENTADOS.every(p=>aptidao({acidez:5,corpo:5,aroma:8,processo:p}).nivel==='coado'), FERMENTADOS.map(p=>aptidao({acidez:5,corpo:5,aroma:8,processo:p}).nivel).join(', '));
+  t('Mesmos eixos sem fermentação não levam a penalidade', aptidao({acidez:5,corpo:5,aroma:8,processo:'lavado'}).nivel==='versatil', aptidao({acidez:5,corpo:5,aroma:8,processo:'lavado'}).nivel);
 }
 
 const s=document.getElementById('summary');
