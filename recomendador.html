@@ -193,14 +193,15 @@ html[data-theme=dark] .warn{background:#3A2D17; border-color:#7A5E2B; color:#EAC
     <div class="actions" style="margin-top:12px">
       <button class="abtn" id="exportbtn">⬇ Exportar JSON</button>
       <button class="abtn" id="importbtn">⬆ Importar JSON</button>
+      <button class="abtn" id="csvbtn">📋 Modelo CSV (planilha)</button>
       <input type="file" id="importfile" accept=".json,application/json" style="display:none">
     </div>
     <div style="margin-top:14px">
-      <label for="sheeturl" style="display:block; font-size:12px; color:var(--ink2); margin-bottom:5px">Planilha pública do Google (link "Publicar na web" → CSV)</label>
-      <input type="text" id="sheeturl" placeholder="https://docs.google.com/spreadsheets/d/e/…/pub?output=csv">
+      <label for="sheeturl" style="display:block; font-size:12px; color:var(--ink2); margin-bottom:5px">Planilha do Google (cole o link normal da planilha ou o de "Publicar na web" → CSV)</label>
+      <input type="text" id="sheeturl" placeholder="https://docs.google.com/spreadsheets/d/…">
       <div class="actions"><button class="abtn" id="sheetbtn">🔄 Importar / merge da planilha</button></div>
     </div>
-    <p class="note">Na planilha: <b>Arquivo → Compartilhar → Publicar na web</b>, escolha a aba e o formato <b>CSV</b>, e cole o link aqui (fica lembrado). Colunas: <b>nome</b> e <b>processo</b> (obrigatórias) · torrefador · torra · acidez · corpo · aroma · notas (separe por <b>;</b>) · origem · variedade. O merge é por nome+torrefador: linha nova cadastra, linha existente atualiza — e se a planilha não tiver eixos, os seus ajustes finos são preservados. A importação JSON também faz merge (por id).</p>
+    <p class="note">Compartilhe a planilha com <b>"Qualquer pessoa com o link"</b> (basta como leitor) e cole o link aqui (fica lembrado) — o link de "Publicar na web → CSV" também funciona. Para começar, o botão <b>Modelo CSV</b> baixa o cabeçalho certo (com os seus cafés, se houver): na planilha, use <b>Arquivo → Importar → Substituir</b>. Colunas: <b>nome</b> e <b>processo</b> (obrigatórias) · torrefador · torra · acidez · corpo · aroma · notas (separe por <b>;</b>) · origem · variedade. O merge é por nome+torrefador: linha nova cadastra, linha existente atualiza — e se a planilha não tiver eixos, os seus ajustes finos são preservados. A importação JSON também faz merge (por id).</p>
     <p class="note" id="syncstatus" style="font-weight:600"></p>
   </details>
 </div>
@@ -566,14 +567,37 @@ function parseCsv(text){
   return rows.filter(r=>r.some(x=>x.trim()!==''));
 }
 
+function baixar(nomeArq,conteudo,mime){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([conteudo],{type:mime}));
+  a.download=nomeArq;
+  document.body.appendChild(a); a.click(); a.remove();
+}
 $('#exportbtn').onclick=()=>{
   const data=JSON.stringify({app:'aguacafe',versao:1,exportadoEm:new Date().toISOString(),cafes:MEUS},null,2);
   try{
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));
-    a.download='aguacafe-meus-cafes.json';
-    document.body.appendChild(a); a.click(); a.remove();
-    $('#syncstatus').textContent=`✓ Exportados ${MEUS.length} café(s).`;
+    baixar('aguacafe-meus-cafes.json',data,'application/json');
+    $('#syncstatus').textContent=MEUS.length
+      ? `✓ Exportados ${MEUS.length} café(s).`
+      : 'Backup vazio: você ainda não cadastrou cafés seus neste navegador (os "Cafés do site" já vivem no código e não precisam de backup). Para levar para a planilha, use o Modelo CSV.';
+  }catch(_){ $('#syncstatus').textContent='Não deu para gerar o arquivo neste navegador.'; }
+};
+$('#csvbtn').onclick=()=>{
+  const cols=['nome','torrefador','processo','torra','acidez','corpo','aroma','notas','origem','variedade'];
+  const cell=v=>{ v=String(v??''); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  const dec=v=>String(v??'').replace('.',',');
+  const linha=c=>[c.nome,c.torrefador,c.processo,TORRAS[c.torra]?TORRAS[c.torra].n:c.torra,
+    dec(c.acidez),dec(c.corpo),dec(c.aroma),(c.notas||[]).join('; '),c.origem||'',c.variedade||''].map(cell).join(',');
+  const exemplos=[
+    'Exemplo · Koji da Mogiana,Torrefação Exemplo,koji,média,"8,5",5,10,floral; hibisco; framboesa,Alta Mogiana/MG,Pau Brasil',
+    'Exemplo · Catuaí da feira,,lavado,,,,,,,',
+  ];
+  const linhas=MEUS.length?MEUS.map(linha):exemplos;
+  try{
+    baixar('aguacafe-planilha.csv','\ufeff'+[cols.join(',')].concat(linhas).join('\r\n'),'text/csv;charset=utf-8');
+    $('#syncstatus').textContent=MEUS.length
+      ? `✓ Modelo CSV gerado com os seus ${MEUS.length} café(s) — na planilha: Arquivo → Importar → Substituir.`
+      : '✓ Modelo CSV gerado com 2 linhas de exemplo — na planilha: Arquivo → Importar → Substituir; depois troque os exemplos pelos seus cafés.';
   }catch(_){ $('#syncstatus').textContent='Não deu para gerar o arquivo neste navegador.'; }
 };
 $('#importbtn').onclick=()=>$('#importfile').click();
@@ -588,13 +612,23 @@ $('#importfile').onchange=async e=>{
   }catch(_){ $('#syncstatus').textContent='Arquivo inválido — exporte pelo botão acima para ver o formato esperado.'; }
   e.target.value='';
 };
+function sheetCsvUrl(url){
+  // Link normal (…/d/<id>/edit#gid=N) → endpoint gviz em CSV, que aceita
+  // fetch cross-origin quando a planilha está em "qualquer pessoa com o link".
+  // O link de "Publicar na web" (…/d/e/…/pub?output=csv) passa intocado.
+  if(/\/pub\?|output=csv/.test(url)) return url;
+  const m=url.match(/docs\.google\.com\/spreadsheets\/d\/([\w-]{20,})/);
+  if(!m) return url;
+  const gid=(url.match(/[#?&]gid=(\d+)/)||[])[1]||'0';
+  return `https://docs.google.com/spreadsheets/d/${m[1]}/gviz/tq?tqx=out:csv&headers=1&gid=${gid}`;
+}
 $('#sheetbtn').onclick=async()=>{
   const url=$('#sheeturl').value.trim();
-  if(!url){ $('#syncstatus').textContent='Cole o link "Publicar na web" (CSV) da planilha.'; return; }
+  if(!url){ $('#syncstatus').textContent='Cole o link da planilha (o normal serve, se ela estiver compartilhada com "qualquer pessoa com o link").'; return; }
   try{ localStorage.setItem(LS_SHEET,url); }catch(_){}
   $('#syncstatus').textContent='Baixando a planilha…';
   try{
-    const res=await fetch(url,{cache:'no-store'});
+    const res=await fetch(sheetCsvUrl(url),{cache:'no-store'});
     if(!res.ok) throw new Error('http '+res.status);
     const rows=parseCsv(await res.text());
     if(rows.length<2) throw new Error('vazia');
@@ -603,7 +637,7 @@ $('#sheetbtn').onclick=async()=>{
     const r=mergeCafes(objs.map(sanitizeCafe));
     renderAll(); syncMsg(r,'planilha');
   }catch(err){
-    $('#syncstatus').textContent='Não deu para importar — confira se o link é o de "Publicar na web" em formato CSV. (Abra o site via http(s); via file:// o navegador bloqueia o download.)';
+    $('#syncstatus').textContent='Não deu para importar — confira se a planilha está compartilhada com "qualquer pessoa com o link" (ou use o link de "Publicar na web" em CSV) e se a 1ª linha é o cabeçalho. (Abra o site via http(s); via file:// o navegador bloqueia o download.)';
   }
 };
 try{ const u=localStorage.getItem(LS_SHEET); if(u) $('#sheeturl').value=u; }catch(_){}

@@ -24,10 +24,12 @@ O portal fica em `https://SEU_USUARIO.github.io/agua-cafe/`.
   Quem decide a água é o **processo**, não a variedade. Dá para **cadastrar os
   seus cafés** direto na página (ficam salvos no navegador), compartilhar a
   água de um café por link, **exportar/importar backup em JSON** e fazer
-  **merge a partir de uma planilha pública do Google** (Arquivo → Compartilhar →
-  Publicar na web → CSV): cadastre na planilha quando quiser e importe — linhas
-  novas entram, existentes atualizam, e os ajustes finos feitos na página são
-  preservados quando a planilha não traz os eixos.
+  **merge a partir de uma planilha do Google** (basta o link normal da planilha,
+  compartilhada com "qualquer pessoa com o link"): cadastre na planilha quando
+  quiser e importe — linhas novas entram, existentes atualizam, e os ajustes
+  finos feitos na página são preservados quando a planilha não traz os eixos.
+  O botão **Modelo CSV** baixa o cabeçalho pronto (com os seus cafés, se
+  houver) para começar a planilha.
 - `kit.html` — lista de minerais, equipamentos e acessórios com links de compra.
 - `avaliador.html` — avaliar uma água mineral de rótulo e corrigir até o alvo.
   Se a água já passa do alvo em dureza/alcalinidade (ou tem sódio/cloreto/TDS
@@ -47,9 +49,11 @@ salva no navegador).
 
 ## Planilha do Google (modelo)
 
-Para cadastrar cafés direto de uma planilha sua: crie uma aba com este
-cabeçalho (só `nome` e `processo` são obrigatórias — copie a tabela abaixo e
-cole no Sheets, que as células se separam sozinhas):
+Para cadastrar cafés direto de uma planilha sua: o caminho rápido é o botão
+**📋 Modelo CSV (planilha)** no recomendador — baixe o arquivo e, no Sheets,
+use **Arquivo → Importar → Fazer upload → Substituir planilha**. Ou crie uma
+aba com este cabeçalho (só `nome` e `processo` são obrigatórias — copie a
+tabela abaixo e cole no Sheets, que as células se separam sozinhas):
 
 | nome | torrefador | processo | torra | acidez | corpo | aroma | notas | origem | variedade |
 |------|------------|----------|-------|--------|-------|-------|-------|--------|-----------|
@@ -66,10 +70,12 @@ Regras:
   café herda o DNA do processo+torra — e reimportar **preserva** o ajuste fino
   que você fez na página. Preenchidos, a planilha manda.
 - **notas** separadas por `;` (a vírgula é separador do CSV).
-- Publique com **Arquivo → Compartilhar → Publicar na web → (aba) → CSV** e
-  cole o link na seção "Backup & planilha" do recomendador. Reimportar faz
-  merge: linha nova cadastra, existente atualiza (id = nome+torrefador), nada
-  duplica. ⚠ O link publicado é legível por quem o tiver.
+- Compartilhe a planilha com **"Qualquer pessoa com o link"** (como leitor já
+  basta) e cole o **link normal** dela na seção "Backup & planilha" do
+  recomendador — o site converte sozinho para o CSV. O link de **Publicar na
+  web → CSV** também é aceito. Reimportar faz merge: linha nova cadastra,
+  existente atualiza (id = nome+torrefador), nada duplica.
+  ⚠ Em qualquer dos dois modos, a planilha fica legível por quem tiver o link.
 
 ## O que ele faz
 
