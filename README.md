@@ -21,7 +21,9 @@ O portal fica em `https://SEU_USUARIO.github.io/agua-cafe/`.
 - `recomendador.html` — **café → água ideal**: escolha um café cadastrado (ou
   monte pelo processo + torra do pacote) e receba o perfil de água sob medida —
   quantas gotas de cada mineral, GH/KH/TDS e a aptidão de preparo (espresso/coado).
-  Quem decide a água é o **processo**, não a variedade. Dá para **cadastrar os
+  Quem decide a água é o **processo**, não a variedade. Tem ainda uma alavanca
+  opcional de **toque de sódio** (default 0): um traço de sódio suprime o amargor
+  e abre os aromáticos — truque de competição de coado. Dá para **cadastrar os
   seus cafés** direto na página (ficam salvos no navegador), compartilhar a
   água de um café por link, **exportar/importar backup em JSON** e fazer
   **merge a partir de uma planilha do Google** (basta o link normal da planilha,
@@ -79,7 +81,7 @@ Regras:
 
 ## O que ele faz
 
-- Perfis prontos (doçura & acidez, equilibrado, brilhante, encorpado, espresso sem cálcio).
+- Perfis prontos (doçura & acidez, equilibrado, brilhante, encorpado, coado com toque de sódio, espresso sem cálcio).
 - Edição livre dos íons-alvo: Mg, Ca, Na, K (ppm).
 - Calcula GH, KH e TDS resultantes.
 - Receita das 4 soluções-mãe (g por 100 mL) — fixas, dependem só da concentração.

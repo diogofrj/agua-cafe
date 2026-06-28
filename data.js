@@ -31,6 +31,7 @@ const PRESETS = [
   {n:'Equilibrado', d:'Corpo e acidez em equilíbrio, buffer médio.', v:{mg:7,ca:17,na:0,k:30}},
   {n:'Brilhante / leve', d:'TDS baixo, muito limpo e ácido.', v:{mg:10,ca:2,na:0,k:12}},
   {n:'Encorpado', d:'Cálcio alto, corpo pesado, acidez contida.', v:{mg:8,ca:25,na:0,k:35}},
+  {n:'🧂 Coado + toque de sódio', d:'Coado limpo com um traço de sódio: suprime o amargor e abre os aromáticos sem achatar a acidez. Sódio é toque — não exagere.', v:{mg:10,ca:6,na:6,k:12}},
   {n:'☕ Espresso doce & encorpado', d:'Sem cálcio: zero cloreto → menos corrosão e sem calcário duro. Doçura do magnésio, corpo do sódio, buffer médio que protege a máquina.', v:{mg:15,ca:0,na:10,k:16}},
   {n:'Álvaro 10·10·5·5', d:'O exemplo da calculadora original, para comparar.', v:{mg:10,ca:10,na:5,k:5}, cmp:true},
 ];

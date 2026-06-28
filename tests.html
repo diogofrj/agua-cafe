@@ -78,6 +78,10 @@ grp('Perfis (PRESETS)');
   const esp=PRESETS.find(p=>p.n.includes('Espresso'));
   t('Existe um perfil de espresso', !!esp, '—');
   t('Espresso sem cálcio (cloreto corrói, cálcio incrusta)', esp && esp.v.ca===0, esp&&esp.v.ca);
+  const naCoado=PRESETS.find(p=>p.n.includes('toque de sódio'));
+  t('Existe um preset de coado com toque de sódio', !!naCoado, '—');
+  t('Coado com sódio: Na > 0 e mantém o cálcio (≠ espresso)', naCoado && naCoado.v.na>0 && naCoado.v.ca>0, naCoado&&`na=${naCoado.v.na}, ca=${naCoado.v.ca}`);
+  t('Coado com sódio: KH ≤ 45 (não achata a acidez)', naCoado && khPpm(hco3FromCations(naCoado.v.na,naCoado.v.k))<=45, naCoado&&khPpm(hco3FromCations(naCoado.v.na,naCoado.v.k)).toFixed(1));
   t('Todo preset tem os 4 íons ≥ 0', PRESETS.every(p=>KEYS.every(k=>p.v[k]>=0)), '—');
   t('TDS de todo preset entre 30 e 250 mg/L', PRESETS.every(p=>{const x=tdsOf(p.v); return x>30&&x<250;}), PRESETS.map(p=>tdsOf(p.v).toFixed(0)).join(', '));
 }
