@@ -210,6 +210,8 @@ html[data-theme=dark] .warn{background:#3A2D17; border-color:#7A5E2B; color:#EAC
   <div class="label">2 · Ajuste fino <span style="text-transform:none; letter-spacing:0; color:var(--ink3)">— se o pacote te surpreender</span></div>
   <div id="eixos"></div>
   <p class="note">Estes três eixos vêm do processo + torra e movem a receita. Mexa só se a xícara fugir do esperado.</p>
+  <div id="sodio" style="margin-top:8px; border-top:1px dashed var(--line); padding-top:6px"></div>
+  <p class="note">Opcional: <b>0 = sem sódio</b>. Um toque (3–8 ppm) suaviza o amargor e abre o aroma — truque de competição de coado. Sobe um pouco o KH; não exagere.</p>
 </div>
 
 <div class="card">
@@ -239,7 +241,7 @@ html[data-theme=dark] .warn{background:#3A2D17; border-color:#7A5E2B; color:#EAC
   </div>
 </div>
 
-<p class="foot">Minerais: MgSO₄·7H₂O · CaCl₂·2H₂O · KHCO₃ — base água destilada/osmose.<br>Perfil calculado para coado/filtrado. Para extrair em espresso, prefira o perfil <b>Espresso</b> (sem cálcio) no “Construir do zero”.</p>
+<p class="foot">Minerais: MgSO₄·7H₂O · CaCl₂·2H₂O · KHCO₃ (· NaHCO₃ no toque de sódio) — base água destilada/osmose.<br>Perfil calculado para coado/filtrado. Para extrair em espresso, prefira o perfil <b>Espresso</b> (sem cálcio) no “Construir do zero”.</p>
 </div>
 
 <script src="data.js"></script>
@@ -252,9 +254,11 @@ const $=s=>document.querySelector(s);
 const fmt=(x,d=0)=>x.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-let state={ cafeId:CAFES[0].id, manual:false, eixos:{...pickEixos(CAFES[0])}, vol:500 };
+let state={ cafeId:CAFES[0].id, manual:false, eixos:{...pickEixos(CAFES[0])}, na:0, vol:500 };
 
 function pickEixos(c){ return {acidez:c.acidez, corpo:c.corpo, aroma:c.aroma, processo:c.processo}; }
+// toque de sódio (ppm) opcional, gravado no café do usuário; 0 = sem sódio
+function naOf(c){ return c && c.na>0 ? Math.max(0,Math.min(10,+c.na)) : 0; }
 
 // --- química: ghPpm/khPpm/hco3FromCations/tdsOf/dropsExact/ppmFromDrops vêm de data.js ---
 function gh(p){ return ghPpm(p.mg,p.ca); }
@@ -283,11 +287,12 @@ function buildCafeSelect(){
   $('#cafesel').value = state.manual ? '__manual' : state.cafeId;
   $('#cafesel').onchange = e=>{
     if(e.target.value==='__manual'){
-      state.manual=true;
+      state.manual=true; state.na=0;
       state.eixos={...baselineEixos($('#procsel').value, $('#torrasel').value), processo:$('#procsel').value};
     } else {
       state.manual=false; state.cafeId=e.target.value;
-      state.eixos=pickEixos(allCafes().find(c=>c.id===e.target.value));
+      const c=allCafes().find(c=>c.id===e.target.value);
+      state.eixos=pickEixos(c); state.na=naOf(c);
     }
     renderAll();
   };
@@ -300,6 +305,7 @@ function buildProcTorra(){
   const recompute=()=>{
     state.torraManual=$('#torrasel').value;
     state.eixos={...baselineEixos($('#procsel').value, $('#torrasel').value), processo:$('#procsel').value};
+    state.na=0;
     renderEixos(); renderOutputs();
   };
   $('#procsel').onchange=recompute;
@@ -319,7 +325,7 @@ function buildAddCafe(){
       notas:$('#nc-notas').value.split(',').map(s=>s.trim()).filter(Boolean),
       custom:true };
     MEUS.push(c); saveCustom();
-    state.manual=false; state.cafeId=c.id; state.eixos=pickEixos(c);
+    state.manual=false; state.cafeId=c.id; state.eixos=pickEixos(c); state.na=naOf(c);
     $('#nc-nome').value=''; $('#nc-torr').value=''; $('#nc-notas').value='';
     $('#addcafe').removeAttribute('open');
     renderAll();
@@ -339,7 +345,7 @@ function renderCafeInfo(){
     const del=$('#delcafe');
     if(del) del.onclick=()=>{
       MEUS=MEUS.filter(x=>x.id!==c.id); saveCustom();
-      state.cafeId=CAFES[0].id; state.eixos=pickEixos(CAFES[0]);
+      state.cafeId=CAFES[0].id; state.eixos=pickEixos(CAFES[0]); state.na=0;
       renderAll();
     };
   }
@@ -369,6 +375,27 @@ function renderEixos(){
     }
     renderOutputs();
   });
+  renderSodio();
+}
+// Toque de sódio (opcional, ppm): override do usuário por cima do alvoPpm (que segue na=0).
+// Suprime o amargor e abre o aroma; sobe um pouco o KH. Gravado no café do usuário.
+function renderSodio(){
+  $('#sodio').innerHTML = `
+    <div class="row">
+      <span class="dot" style="background:var(--na)"></span>
+      <span class="mname">🧂 Sódio · toque</span>
+      <input type="range" min="0" max="10" step="0.5" value="${state.na}" id="naSl" class="sl" aria-label="Toque de sódio em ppm">
+      <span class="eixoval num">${fmt(state.na,1)}<span style="font-size:11px; color:var(--ink3)"> ppm</span></span>
+    </div>`;
+  $('#naSl').oninput=function(){
+    state.na=+this.value;
+    this.parentElement.querySelector('.eixoval').firstChild.textContent=fmt(state.na,1);
+    if(!state.manual){
+      const c=MEUS.find(x=>x.id===state.cafeId);
+      if(c){ c.na=state.na; saveCustom(); }
+    }
+    renderOutputs();
+  };
 }
 
 // --- volume ---
@@ -381,6 +408,7 @@ function buildVols(){
 // --- saída ---
 function renderOutputs(){
   const p=alvoPpm(state.eixos);
+  if(state.na>0) p.na=state.na;   // toque de sódio opcional (override; motor segue na=0)
 
   // aptidão
   const ap=aptidao(state.eixos);
@@ -391,7 +419,7 @@ function renderOutputs(){
   // perfil
   const g=gh(p),k=kh(p),t=tds(p);
   $('#stats').innerHTML=
-    `<div class="stat"><div class="k">Mg · Ca · K</div><div class="v num">${p.mg}·${p.ca}·${p.k}</div><div class="u">ppm dos íons</div></div>
+    `<div class="stat"><div class="k">Mg · Ca · ${p.na>0?'Na · ':''}K</div><div class="v num">${p.mg}·${p.ca}·${p.na>0?p.na+'·':''}${p.k}</div><div class="u">ppm dos íons</div></div>
      <div class="stat"><div class="k">Dureza GH</div><div class="v num">${fmt(g)}</div><div class="u">ppm CaCO₃</div></div>
      <div class="stat"><div class="k">Alcalinidade KH</div><div class="v num">${fmt(k)}</div><div class="u">ppm CaCO₃</div></div>`;
   let note='';
@@ -407,6 +435,7 @@ function renderOutputs(){
   const w=$('#tdswarn');
   if(t>180){ w.classList.add('show'); w.innerHTML=`<b>TDS ${fmt(t)} mg/L</b> — perfil bem carregado para esse volume; pode abafar. A faixa SCA confortável é ~75–150.`; }
   else if(t<60){ w.classList.add('show'); w.innerHTML=`<b>TDS ${fmt(t)} mg/L</b> — água bem leve; pode sair aguada. A faixa SCA confortável é ~75–150.`; }
+  else if(k>45 && p.na>0){ w.classList.add('show'); w.innerHTML=`<b>KH ${fmt(k)} ppm CaCO₃</b> — o sódio somou ao potássio (os dois são bicarbonato) e o buffer passou de 45; pode achatar a acidez. Reduza o toque de sódio.`; }
   else { w.classList.remove('show'); }
 
   // doses
@@ -437,6 +466,7 @@ function writeHash(){
     ? `proc=${e.processo}&torra=${$('#torrasel').value}`
     : `cafe=${encodeURIComponent(state.cafeId)}`;
   h += `&a=${e.acidez}&c=${e.corpo}&ar=${e.aroma}&v=${state.vol}`;
+  if(state.na>0) h += `&na=${state.na}`;
   history.replaceState(null,'','#'+h);
   saveLocal();
 }
@@ -446,10 +476,10 @@ function readHash(){
   let any=false;
   if(q.has('cafe')){
     const c=allCafes().find(x=>x.id===q.get('cafe'));
-    if(c){ state.manual=false; state.cafeId=c.id; state.eixos=pickEixos(c); any=true; }
+    if(c){ state.manual=false; state.cafeId=c.id; state.eixos=pickEixos(c); state.na=naOf(c); any=true; }
   } else if(q.has('proc') && PROCESSOS[q.get('proc')]){
     const proc=q.get('proc'), torra=TORRAS[q.get('torra')]?q.get('torra'):'media';
-    state.manual=true; state.torraManual=torra;
+    state.manual=true; state.torraManual=torra; state.na=0;
     state.eixos={...baselineEixos(proc,torra), processo:proc};
     any=true;
   }
@@ -457,13 +487,14 @@ function readHash(){
     [['a','acidez'],['c','corpo'],['ar','aroma']].forEach(([qk,ek])=>{
       if(q.has(qk)){ const v=parseFloat(q.get(qk)); if(!isNaN(v)) state.eixos[ek]=Math.max(0,Math.min(10,v)); }
     });
+    if(q.has('na')){ const v=parseFloat(q.get('na')); if(!isNaN(v)) state.na=Math.max(0,Math.min(10,v)); }
   }
   if(q.has('v')){ const v=parseInt(q.get('v'),10); if(VOLS.includes(v)) state.vol=v; }
   return any;
 }
 function saveLocal(){
   try{ localStorage.setItem('aguacafe.recomendador',JSON.stringify({
-    cafeId:state.cafeId, manual:state.manual, vol:state.vol,
+    cafeId:state.cafeId, manual:state.manual, vol:state.vol, na:state.na,
     proc:state.eixos.processo, torra:$('#torrasel').value })); }catch(_){}
 }
 function loadLocal(){
@@ -475,10 +506,11 @@ function loadLocal(){
       const torra=TORRAS[s.torra]?s.torra:'media';
       state.manual=true; state.torraManual=torra;
       state.eixos={...baselineEixos(s.proc,torra), processo:s.proc};
+      state.na=s.na>0?Math.max(0,Math.min(10,+s.na)):0;
       return true;
     }
     const c=allCafes().find(x=>x.id===s.cafeId);
-    if(c){ state.manual=false; state.cafeId=c.id; state.eixos=pickEixos(c); return true; }
+    if(c){ state.manual=false; state.cafeId=c.id; state.eixos=pickEixos(c); state.na=naOf(c); return true; }
     return false;
   }catch(_){ return false; }
 }
