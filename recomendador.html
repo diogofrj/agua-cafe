@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Café → água ideal · recomendador</title>
 <meta name="description" content="Escolha um café (ou monte por processo e torra) e receba o perfil de água sob medida — quantas gotas de cada mineral e o método de preparo.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 3C10 12 7 16 7 21a9 9 0 0 0 18 0c0-5-3-9-9-18z' fill='%237A4B22'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 3C10 12 7 16 7 21a9 9 0 0 0 18 0c0-5-3-9-9-18z' fill='%232A4E85'/></svg>">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#F2ECE0">
+<meta name="theme-color" content="#E7EDF6">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Café → água ideal · recomendador">
 <meta property="og:description" content="Escolha um café (ou monte por processo e torra) e receba o perfil de água sob medida — gotas por mineral e aptidão espresso/coado.">
@@ -18,22 +18,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root{
-  --paper:#F2ECE0; --surf:#FAF6EE; --surf2:#EBE3D3;
-  --ink:#2B211A; --ink2:#6E6053; --ink3:#9C8E7E;
-  --line:rgba(43,33,26,.13); --line2:rgba(43,33,26,.28);
+  --paper:#E7EDF6; --surf:#F5F8FC; --surf2:#DCE5F1;
+  --ink:#16223A; --ink2:#4C5D7A; --ink3:#7C8CAA;
+  --line:rgba(22,34,58,.14); --line2:rgba(22,34,58,.30);
   --mg:#1E6F8E; --ca:#3F7D43; --na:#C07A2B; --k:#B0463A;
-  --coffee:#7A4B22;
-  --dots:rgba(43,33,26,.035);
-  --r:12px; --rs:8px;
+  --accent:#2A4E85;
+  --grid:rgba(22,34,58,.06);
+  --r:3px; --rs:2px;
   color-scheme:light;
 }
 html[data-theme=dark]{
-  --paper:#1B1511; --surf:#241D17; --surf2:#312822;
-  --ink:#EDE4D6; --ink2:#B3A492; --ink3:#857665;
-  --line:rgba(237,228,214,.13); --line2:rgba(237,228,214,.3);
+  --paper:#0F1826; --surf:#16202E; --surf2:#1F2C3D;
+  --ink:#E7ECF5; --ink2:#A6B4CB; --ink3:#71809C;
+  --line:rgba(231,236,245,.13); --line2:rgba(231,236,245,.3);
   --mg:#3E9DC2; --ca:#69AC6F; --na:#D69A52; --k:#CE7164;
-  --coffee:#C98F55;
-  --dots:rgba(237,228,214,.04);
+  --accent:#7AA0DE;
+  --grid:rgba(231,236,245,.05);
   color-scheme:dark;
 }
 *{box-sizing:border-box; margin:0; padding:0}
@@ -41,24 +41,25 @@ body{
   background:var(--paper); color:var(--ink);
   font-family:'Hanken Grotesk',sans-serif; font-size:16px; line-height:1.6;
   -webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(var(--dots) 1px,transparent 1px);
-  background-size:22px 22px;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;
 }
 .wrap{max-width:860px; margin:0 auto; padding:28px 18px 64px}
 .num{font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums}
 
-nav{display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap}
-nav a{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; text-decoration:none; color:var(--ink2); border:1px solid var(--line2); padding:7px 13px; border-radius:99px}
-nav a.on{color:var(--surf); background:var(--ink); border-color:var(--ink)}
+nav{display:flex; gap:2px; margin-bottom:26px; flex-wrap:wrap; border-bottom:1px solid var(--line)}
+nav a{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; text-decoration:none; color:var(--ink2); padding:9px 14px 10px; border-bottom:2px solid transparent; margin-bottom:-1px; transition:.15s}
+nav a:hover{color:var(--ink)}
+nav a.on{color:var(--accent); border-bottom-color:var(--accent)}
 
 header{margin-bottom:26px}
-.kicker{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--coffee); margin-bottom:8px}
+.kicker{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:8px}
 h1{font-family:'Fraunces',serif; font-weight:500; font-size:33px; line-height:1.05; letter-spacing:-.01em}
-h1 em{font-style:italic; color:var(--coffee)}
+h1 em{font-style:italic; color:var(--accent)}
 .sub{color:var(--ink2); font-size:14.5px; margin-top:8px; max-width:62ch}
 
-.card{background:var(--surf); border:1px solid var(--line); border-radius:var(--r); padding:18px 18px 20px; margin-bottom:16px}
-.label{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink3); margin-bottom:12px}
+.card{background:var(--surf); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:var(--r); padding:18px 18px 20px; margin-bottom:16px}
+.label{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink3); margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed var(--line)}
 .note{font-size:12.5px; color:var(--ink2); margin-top:10px; line-height:1.55}
 
 select{width:100%; font-family:'Hanken Grotesk',sans-serif; font-size:15px; padding:11px 12px; background:var(--surf); border:1px solid var(--line2); border-radius:var(--rs); color:var(--ink); cursor:pointer}
@@ -68,7 +69,7 @@ select:focus{outline:none; border-color:var(--ink)}
 .selrow label{display:block; font-size:12px; color:var(--ink2); margin-bottom:5px}
 
 .tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
-.tag{font-size:12px; padding:4px 10px; border-radius:99px; background:var(--surf2); color:var(--ink2)}
+.tag{font-size:12px; padding:4px 10px; border-radius:2px; background:var(--surf2); color:var(--ink2)}
 .meta{font-size:13px; color:var(--ink2); margin-top:8px}
 .meta b{color:var(--ink); font-weight:500}
 
@@ -84,9 +85,9 @@ input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; 
 .vols{display:flex; flex-wrap:wrap; gap:7px; align-items:center}
 .vol{font-family:'JetBrains Mono',monospace; font-size:13px; padding:7px 12px; border:1px solid var(--line2); background:transparent; border-radius:var(--rs); cursor:pointer; color:var(--ink)}
 .vol:hover{background:var(--surf2)}
-.vol.on{background:var(--coffee); color:#fff; border-color:var(--coffee)}
+.vol.on{background:var(--accent); color:#fff; border-color:var(--accent)}
 
-.badge{display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:500; padding:9px 14px; border-radius:99px; border:1px solid var(--line2)}
+.badge{display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:500; padding:9px 14px; border-radius:2px; border:1px solid var(--line2)}
 .badge.espresso{background:#F0E6D2; border-color:#D9B97E; color:#6B4A18}
 .badge.coado{background:#E4ECE0; border-color:#A7C49C; color:#3a5a32}
 .badge.versatil{background:var(--surf2); color:var(--ink2)}
@@ -113,14 +114,14 @@ html[data-theme=dark] .badge.coado{background:#22301F; border-color:#4E6B45; col
 html[data-theme=dark] .warn{background:#3A2D17; border-color:#7A5E2B; color:#EAC988}
 
 .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px}
-.abtn{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.04em; color:var(--ink2); background:transparent; border:1px solid var(--line2); border-radius:99px; padding:8px 14px; cursor:pointer; text-decoration:none; display:inline-block}
+.abtn{font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.04em; color:var(--ink2); background:transparent; border:1px solid var(--line2); border-radius:2px; padding:8px 14px; cursor:pointer; text-decoration:none; display:inline-block}
 .abtn:hover{background:var(--surf2)}
 .foot{font-size:12px; color:var(--ink3); margin-top:22px; line-height:1.6; text-align:center}
 
 .adv{margin-top:16px}
 .adv summary{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3); cursor:pointer; list-style:none}
 .adv summary::-webkit-details-marker{display:none}
-.adv summary:before{content:'+ '; color:var(--coffee)}
+.adv summary:before{content:'+ '; color:var(--accent)}
 .adv[open] summary:before{content:'– '}
 .adv input[type=text]{width:100%; font-family:'Hanken Grotesk',sans-serif; font-size:14px; padding:9px 11px; background:var(--surf); border:1px solid var(--line2); border-radius:var(--rs); color:var(--ink)}
 .adv input[type=text]:focus{outline:none; border-color:var(--ink)}
@@ -144,7 +145,7 @@ html[data-theme=dark] .warn{background:#3A2D17; border-color:#7A5E2B; color:#EAC
   <a href="kit.html">Monte seu kit</a>
   <a href="avaliador.html">Corrigir água mineral</a>
   <a href="etiquetas.html">Etiquetas</a>
-  <button id="themebtn" style="margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; color:var(--ink2); background:transparent; border:1px solid var(--line2); padding:7px 13px; border-radius:99px; cursor:pointer"></button>
+  <button id="themebtn" style="margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.06em; color:var(--ink2); background:transparent; border:1px solid var(--line2); padding:7px 13px; border-radius:2px; cursor:pointer"></button>
 </nav>
 
 <header>
